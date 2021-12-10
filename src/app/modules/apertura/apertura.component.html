@@ -1,0 +1,216 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Apertura de Inventario</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Inventario</a></li>
+                    <li class="breadcrumb-item active">Apertura de Inventario</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card" [class.card-primary]="paso_1" [class.card-secondary]="paso_2">
+                    <div class="card-header">
+                        <h3 class="card-title">Paso 1</h3>
+                    </div>
+                    <form autocomplete="off" id="formularioPaso1" (ngSubmit)="submitCriterios(formulario)"
+                        #formulario="ngForm">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="selectLocales">Local</label>
+                                <select [disabled]="paso_2" #Local="ngModel" [(ngModel)]="localId" name="Local"
+                                    id="selectLocales" class="custom-select" required>
+                                    <option value="0">Selecciona un Local</option>
+                                    <option [value]="local.localId" *ngFor="let local of locales">{{local.descripcion}}
+                                    </option>
+                                </select>
+                                <span *ngIf="Local.value==0 && Local.touched " class="error-custom">Seleccione un local
+                                    válido</span>
+                            </div>
+                            <!-- <div class="form-group">
+                                <label for="selectAlmacenes">Almacen</label>
+                                <select #Almacen="ngModel" [(ngModel)]="almacenId" [disabled]="localId==0 || paso_2"
+                                    name="Almacen" id="selectAlmacenes" class="custom-select" required>
+                                    <option value="0">Selecciona un Almacen</option>
+                                    <option [value]="almacen.almacenId" *ngFor="let almacen of almacenes">
+                                        {{almacen.descripcion}}
+                                    </option>
+                                </select>
+                                <span *ngIf="Almacen.value==0 && Almacen.touched " class="error-custom">Seleccione un
+                                    almacen válido</span>
+                            </div> -->
+                            <div class="form-group">
+                                <label for="selectTiposInventario">Tipo de Inventario</label>
+                                <select [disabled]="paso_2" #TipoInventario="ngModel" [(ngModel)]="tipoInventarioId"
+                                    name="TipoInventario" id="selectTiposInventario" class="custom-select" required>
+                                    <option value="0">Selecciona un Tipo de Inventario</option>
+                                    <option [value]="tipoInventario.tipoInventarioId"
+                                        *ngFor="let tipoInventario of tiposInventario">{{tipoInventario.descripcion}}
+                                    </option>
+                                </select>
+                                <span *ngIf="TipoInventario.value==0 && TipoInventario.touched "
+                                    class="error-custom">Seleccione un tipo de inventario válido</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn" [class.btn-primary]="paso_1" [disabled]="paso_2"
+                                [class.btn-secondary]="paso_2">Siguiente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card" [class.card-primary]="paso_2" [class.card-secondary]="paso_1">
+                    <div class="card-header">
+                        <h3 class="card-title">Paso 2</h3>
+                    </div>
+                    <form autocomplete="off" id="formularioPaso2" (ngSubmit)="submitCriterios(formularioPaso2)"
+                        #formularioPaso2="ngForm">
+                        <div class="card-body p-0">
+                            <table class="table row-border">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 100px;">Seleccionar</th>
+                                        <th>Almacen</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngFor="let almacen of almacenes;let i = index">
+                                    <tr>
+                                        <td class="text-center"> <input class="form-check-input"
+                                                [(ngModel)]="almacen.selected" (click)="seleccionarAlmacen(almacen)" name="cbg_almacen" type="checkbox"></td>
+                                        <td>
+                                            {{almacen.descripcion}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td class="p-0">
+                                            <table class="table row-border">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th style="width: 100px;">Seleccionar</th>
+                                                        <th>Subir Stock Teorico</th>
+                                                        <th>Area</th>
+                                                        <th>Archivo</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let ar of almacen.areas;let i = index;">
+                                                        <td class="text-center"> <input class="form-check-input"
+                                                                [(ngModel)]="ar.selected"  name="cbg_area_{{ar.areaId}}" type="checkbox"></td>
+                                                        <td style="width: 20px;">
+                                                            <button type="button" class="btn btn-info"
+                                                                data-toggle="modal" (click)="verArticulos(ar)"
+                                                                data-target="#modal-default">
+                                                                <i class="fas fa-file-upload"></i>
+                                                            </button>
+                                                        </td>
+                                                        <td>
+                                                            {{ar.descripcion}}
+                                                        </td>
+                                                        <td>
+                                                            {{ar.archivo}}
+                                                        </td>
+
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn" [class.btn-primary]="paso_2" [disabled]="paso_1"
+                                (click)="atras()" [class.btn-secondary]="paso_1">Atras</button>
+
+                            <button (click)="aperturar()" type="button"
+                            [disabled]="paso_1"
+                                class="btn btn-success">
+                                Aperturar areas seleccionadas</button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-default" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Articulos en {{area.descripcion}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" (click)="cerrarModal()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="p-3">
+                        <div class="form-group">
+                            <label>Subir Stock Teorico: &nbsp;&nbsp;</label>
+                            <input [disabled]="area.articulos?.length==0" type="file" appReadexcel #myInputFile
+                                (eventEmitter)="DataFromEventEmmiter($event)">
+                        </div>
+                    </div>
+
+                    <div class="p-3" *ngIf="articulosAlerta.length!=0">
+                        <div class="alert alert-warning alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h5><i class="icon fas fa-exclamation-triangle"></i> Alerta!</h5>
+                            Existen {{articulosAlerta.length}} articulos que no coincidieron con los registros
+                            almacenados.
+                            <ul>
+                                <li *ngFor="let articulo of articulosAlerta">Codigo: {{articulo.codigo}} </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Articulo</th>
+                                <th>Stock Teorico</th>
+                                <th>Precio Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="area.articulos.length==0">
+                                <td colspan="4">
+                                    <p class="text-center">
+                                        No se encontraron articulos
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr *ngFor="let articulo of area.articulos">
+                                <td>{{articulo.codigo}}</td>
+                                <td>{{articulo.descripcion}}</td>
+                                <td>{{articulo.stockTeorico}}</td>
+                                <td class="text-right">{{articulo.precioPromedio | currency:'S/. '}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()">
+                        Cancelar</button>
+                    <button [disabled]="area.articulos?.length==0" data-dismiss="modal" (click)="subir(area)"
+                        class="btn btn-primary"><i class="fa fa-upload"></i>&nbsp;&nbsp;
+                        Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

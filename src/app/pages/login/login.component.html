@@ -1,0 +1,44 @@
+<div class="hold-transition login-page">
+    <div class="login-box">
+        <!-- /.login-logo -->
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                <a class="h1"><b>Inventarios</b></a>
+            </div>
+            <div class="card-body">
+                <p class="login-box-msg">Ingrese sus credenciales</p>
+
+                <form autocomplete="off" id="formularioLogin" (ngSubmit)="login(forma)" #forma="ngForm">
+                    <div class="input-group mb-3">
+                        <input [class.is-invalid]="usuario.invalid && usuario.touched" name="usuario" type="text"
+                            [(ngModel)]="user!.usuario" class="form-control" id="usuario" placeholder="Ingrese usuario"
+                            required #usuario="ngModel">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input [class.is-invalid]="contrasena.invalid && contrasena.touched" type="password" [(ngModel)]="user!.clave"
+                            name="contrasena" class="form-control" id="contrasena" placeholder="Ingrese contraseña"
+                            required #contrasena="ngModel">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>

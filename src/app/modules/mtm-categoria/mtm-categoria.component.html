@@ -1,0 +1,104 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Categorías</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Mantenimiento</a></li>
+                    <li class="breadcrumb-item active">Categorías</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-success" (click)="creando=true;" data-toggle="modal"
+                    data-target="#modal-default"><i class="fa fa-plus"></i>&nbsp;&nbsp; Nueva Categoría</button>
+                <br><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Categorías</h3>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre de categoría</th>
+                                    <th>Empresa</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let categoria of categorias">
+                                    <td>{{categoria.categoriaId}}</td>
+                                    <td>{{categoria.descripcion}}</td>
+                                    <td>{{categoria.empresa}}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button (click)="editar(categoria)" type="button" class="btn btn-warning" data-toggle="modal"
+                                            data-target="#modal-default">
+                                                <i class="fas fa-edit" ></i>
+                                            </button>
+                                            <button (click)="eliminar(categoria.categoriaId)" type="button" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-default"  data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form autocomplete="off" id="formulario" (ngSubmit)="submit(formulario)"
+                    #formulario="ngForm">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{creando?'Nueva':'Editando'}} Categoría</h4>
+                        <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="inputDescripcion">Nombre de Categoría</label>
+                            <input [class.is-invalid]="Categoria.invalid && Categoria.touched" type="text"
+                                #Categoria="ngModel" [(ngModel)]="categoria.descripcion" name="Categoria" id="inputDescripcion"
+                                class="form-control" placeholder="Ingrese nombre de categoria" required>
+                            <span *ngIf="Categoria.invalid && Categoria.touched " class="error-custom">Ingrese nombre de
+                                categoria</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select [(ngModel)]="categoria.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (categoria.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()"> Cerrar</button>
+                        <button type="submit" [disabled]="formulario.invalid || categoria.empresaId==0 " class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;&nbsp;
+                            Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

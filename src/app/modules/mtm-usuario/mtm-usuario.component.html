@@ -1,0 +1,165 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Usuarios</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Mantenimiento</a></li>
+                    <li class="breadcrumb-item active">Usuarios</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-success" (click)="creando=true;" data-toggle="modal"
+                    data-target="#modal-default"><i class="fa fa-plus"></i>&nbsp;&nbsp; Nuevo Usuario</button>
+                <br><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Usuarios</h3>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombres</th>
+                                    <th>Usuario</th>
+                                    <th>Clave</th>
+                                    <th>Adminstrador</th>
+                                    <th>Supervisor</th>
+                                    <th>Inventariador</th>
+                                    <th>Empresa</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let usuario of usuarios">
+                                    <td>{{usuario.usuarioId}}</td>
+                                    <td>{{usuario.nombre}}</td>
+                                    <td>{{usuario.usuario}}</td>
+                                    <td>{{usuario.clave}}</td>
+                                    <td>{{usuario.administrador? 'Sí':'No'}}</td>
+                                    <td>{{usuario.supervisor? 'Sí':'No'}}</td>
+                                    <td>{{usuario.inventario? 'Sí':'No'}}</td>
+                                    <td>{{usuario.empresa}}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button (click)="editar(usuario)" type="button" class="btn btn-warning" data-toggle="modal"
+                                            data-target="#modal-default">
+                                                <i class="fas fa-edit" ></i>
+                                            </button>
+                                            <button (click)="eliminar(usuario.usuarioId)" type="button" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-default"  data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form autocomplete="off" id="formulario" (ngSubmit)="submit(formulario)"
+                    #formulario="ngForm">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{creando?'Nuevo':'Editando'}} Usuario</h4>
+                        <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="inputNombre">Nombres</label>
+                            <input [class.is-invalid]="Nombre.invalid && Nombre.touched" type="text"
+                                #Nombre="ngModel" [(ngModel)]="usuario.nombre" name="Nombre" id="inputNombre"
+                                class="form-control" placeholder="Ingrese nombres" required>
+                            <span *ngIf="Nombre.invalid && Nombre.touched " class="error-custom">Ingrese nombres</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputUsuario">Usuario</label>
+                            <input [class.is-invalid]="Usuario.invalid && Usuario.touched" type="text"
+                                #Usuario="ngModel" [(ngModel)]="usuario.usuario" name="Usuario" id="inputUsuario"
+                                class="form-control" placeholder="Ingrese usuario" required>
+                            <span *ngIf="Usuario.invalid && Usuario.touched " class="error-custom">Ingrese usuario</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputClave">Clave</label>
+                            <input [class.is-invalid]="Clave.invalid && Clave.touched" type="text"
+                                #Clave="ngModel" [(ngModel)]="usuario.clave" name="Clave" id="inputClave"
+                                class="form-control" placeholder="Ingrese clave" required>
+                            <span *ngIf="Clave.invalid && Clave.touched " class="error-custom">Ingrese clave</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="selectAdministrador">Administrador</label>
+                            <select [(ngModel)]="auxAdmin" name="Administrador" #Administrador="ngModel"  class="form-control">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectSupervisor">Supervisor</label>
+                            <select [(ngModel)]="auxSuperv" name="Supervisor" #Supervisor="ngModel"  class="form-control">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectInventariador">Inventariador</label>
+                            <select [(ngModel)]="auxInvent" name="Inventariador" #Inventariador="ngModel"  class="form-control">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select [(ngModel)]="usuario.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (usuario.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select [(ngModel)]="usuario.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (usuario.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div> -->
+                        <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select [(ngModel)]="usuario.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (usuario.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()"> Cerrar</button>
+                        <button type="submit" [disabled]="formulario.invalid || usuario.empresaId==0 " class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;&nbsp;
+                            Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

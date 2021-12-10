@@ -1,0 +1,161 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Artículos por Tipo Inventario</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Mantenimiento</a></li>
+                    <li class="breadcrumb-item active">Artículos por Tipo Inventario</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-success" (click)="creando=true;" data-toggle="modal"
+                    data-target="#modal-default"><i class="fa fa-plus"></i>&nbsp;&nbsp; Nuevo Artículo por Tipo Inventario</button>
+                <br><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Artículo por Tipo Inventario</h3>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Artículo</th>
+                                    <th>Tipo de Inventario</th>
+                                    <th>Orden</th>
+                                    <th>Localizacion</th>
+                                    <th>Área</th>
+                                    <th>Almacen</th>
+                                    <th>Local</th>
+                                    <th>Empresa</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let atp of articulosTipoInventario">
+                                    <td>{{atp.codigo}}</td>
+                                    <td>{{atp.articulo}}</td>
+                                    <td>{{atp.tipoInventario}}</td>
+                                    <td>{{atp.orden}}</td>
+                                    <td>{{atp.localizacion}}</td>
+                                    <td>{{atp.area}}</td>
+                                    <td>{{atp.almacen}}</td>
+                                    <td>{{atp.local}}</td>
+                                    <td>{{atp.empresa}}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button (click)="editar(atp)" type="button" class="btn btn-warning" data-toggle="modal"
+                                            data-target="#modal-default">
+                                                <i class="fas fa-edit" ></i>
+                                            </button>
+                                            <button (click)="eliminar(atp.articuloId,atp.tipoInventarioId,atp.areaId)" type="button" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-default"  data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form autocomplete="off" id="formulario" (ngSubmit)="submit(formulario)"
+                    #formulario="ngForm">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{creando?'Nuevo':'Editando'}} Artículo por Tipo Inventario</h4>
+                        <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select (change)="seleccionaEmpresa()" [(ngModel)]="articuloTipoInventario.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articuloTipoInventario.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectLocal">Local</label>
+                            <select (change)="seleccionaLocal()" [(ngModel)]="articuloTipoInventario.localId" name="Local" #Local="ngModel" class="form-control">
+                                <option value="0">Selecciona una Local</option>
+                                <option [value]="local.localId" *ngFor="let local of locales">{{local.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articuloTipoInventario.localId == 0) && Local.touched " class="error-custom">Seleccione el local</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectAlmacen">Almacen</label>
+                            <select (change)="seleccionaAlmacen()" [(ngModel)]="articuloTipoInventario.almacenId" name="Almacen" #Almacen="ngModel" class="form-control">
+                                <option value="0">Selecciona una Almacen</option>
+                                <option [value]="almacen.almacenId" *ngFor="let almacen of almacenes">{{almacen.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articuloTipoInventario.almacenId == 0) && Almacen.touched " class="error-custom">Seleccione el almacen</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectArea">Área</label>
+                            <select  [(ngModel)]="articuloTipoInventario.areaId" name="Area" #Area="ngModel" class="form-control">
+                                <option value="0">Selecciona un Área</option>
+                                <option [value]="area.areaId" *ngFor="let area of areas">{{area.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articuloTipoInventario.areaId == 0) && Area.touched " class="error-custom">Seleccione el área</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectArticulo">Artículo</label>
+                            <select  [(ngModel)]="articuloTipoInventario.articuloId" name="Articulo" #Articulo="ngModel" class="form-control">
+                                <option value="0">Selecciona un Artículo</option>
+                                <option [value]="articulo.articuloId" *ngFor="let articulo of articulos">{{articulo.codigo}} | {{articulo.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articuloTipoInventario.articuloId == 0) && Articulo.touched " class="error-custom">Seleccione el artículo</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectTipoInventario">Tipo de Inventario</label>
+                            <select  [(ngModel)]="articuloTipoInventario.tipoInventarioId" name="TipoInventario" #TipoInventario="ngModel" class="form-control">
+                                <option value="0">Selecciona un Tipo de Inventario</option>
+                                <option [value]="tipoInventario.tipoInventarioId" *ngFor="let tipoInventario of tiposInventario">{{tipoInventario.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articuloTipoInventario.tipoInventarioId == 0) && TipoInventario.touched " class="error-custom">Seleccione el tipo de inventario</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputOrden">Orden</label>
+                            <input [class.is-invalid]="Orden.invalid && Orden.touched" type="number" min="0"
+                                #Orden="ngModel" [(ngModel)]="articuloTipoInventario.orden" name="Orden" id="inputOrden"
+                                class="form-control" placeholder="Ingrese orden" required>
+                            <span *ngIf="Orden.invalid && Orden.touched " class="error-custom">Ingrese orden</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputLocalizacion">Localizacion</label>
+                            <input [class.is-invalid]="Localizacion.invalid && Localizacion.touched" type="text"
+                                #Localizacion="ngModel" [(ngModel)]="articuloTipoInventario.localizacion" name="Localizacion" id="inputLocalizacion"
+                                class="form-control" placeholder="Ingrese localizacion" required>
+                            <span *ngIf="Localizacion.invalid && Localizacion.touched " class="error-custom">Ingrese localizacion</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()"> Cerrar</button>
+                        <button type="submit" [disabled]="formulario.invalid || articuloTipoInventario.empresaId==0 || articuloTipoInventario.localId == 0 || articuloTipoInventario.almacenId == 0 || articuloTipoInventario.areaId == 0 || articuloTipoInventario.tipoInventarioId == 0 || articuloTipoInventario.articuloId == 0" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;&nbsp;
+                            Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

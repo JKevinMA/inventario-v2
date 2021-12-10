@@ -1,0 +1,194 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Toma de Inventario</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Inventario</a></li>
+                    <li class="breadcrumb-item active">Toma de Inventario</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card " [class.card-primary]="paso_1" [class.card-secondary]="paso_2">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de inventarios aperturados </h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Almacen</th>
+                                    <th>Area</th>
+                                    <th>Tipo de Inventario</th>
+                                    <th>Fecha Apertura</th>
+                                    <th>Hora Apertura</th>
+                                    <th>Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center" *ngIf="inventariosAbiertos.length==0">
+                                    <td colspan="7">No existen inventarios aperturados por tomar</td>
+                                </tr>
+                                <tr *ngFor="let inventarioAbierto of inventariosAbiertos"
+                                    [class.table-success]="inventarioIdSeleccionado==inventarioAbierto.inventarioId">
+                                    <td>{{inventarioAbierto.inventarioId}}</td>
+                                    <td>{{inventarioAbierto.almacen}}</td>
+                                    <td>{{inventarioAbierto.area}}</td>
+                                    <td>{{inventarioAbierto.tipoInventario}}</td>
+                                    <td>{{inventarioAbierto.fechaInicio | date:"mediumDate"}}</td>
+                                    <td>{{inventarioAbierto.fechaInicio | date:"shortTime"}}</td>
+                                    <td>
+                                        <button class="btn btn-primary" [class.btn-secondary]="inventarioAbierto.cerrado" [disabled]="paso_2 || inventarioAbierto.cerrado"
+                                            *ngIf="inventarioIdSeleccionado!=inventarioAbierto.inventarioId"
+                                            (click)="iniciarInventario(inventarioAbierto.inventarioId);"
+                                            type="button">{{inventarioAbierto.cerrado?'Cerrado':(inventarioAbierto.iniciado?'Continuar':'Iniciar')}}</button>
+                                        <button class="btn btn-success" [disabled]="paso_2"
+                                            *ngIf="inventarioIdSeleccionado==inventarioAbierto.inventarioId"> En curso
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="paso_2">
+            <div class="col-md-12">
+                <div class="card" [class.card-primary]="paso_2" [class.card-secondary]="paso_1">
+                    <div class="card-header">
+                        <h3 class="card-title">Articulos </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="selectIngreso">Filtro por ingreso</label>
+                                    <select [(ngModel)]="filtroIngreso"  class="form-control" id="selectIngreso">
+                                        <option value="2">Todos</option>
+                                        <option value="0">Con valores ingresados</option>
+                                        <option value="1">Sin valores ingresados</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="selectLocalizacion">Filtro por localización</label>
+                                    <select [(ngModel)]="filtroLocalizacion" class="form-control" id="selectLocalizacion">
+                                        <option value="0">Todos</option>
+                                        <option [value]="loc" *ngFor="let loc of localizaciones">{{loc}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="selectCategoria">Filtro por Categoria</label>
+                                    <select [(ngModel)]="filtroCategoria" class="form-control" id="selectCategoria">
+                                        <option value="0">Todos</option>
+                                        <option [value]="cat" *ngFor="let cat of categorias">{{cat}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="selectFamilia">Filtro por Familia</label>
+                                    <select [(ngModel)]="filtroFamilia" class="form-control" id="selectFamilia">
+                                        <option value="0">Todos</option>
+                                        <option [value]="fam" *ngFor="let fam of familias">{{fam}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                
+                                <div class="form-group">
+                                    <button [disabled]="paso_1" id="select" type="button"
+                                        class="btn btn-outline-primary btn-block" (click)="filtrar()">
+                                        Filtrar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button [disabled]="paso_1" id="select" type="button"
+                                        class="btn btn-success btn-block" data-toggle="modal"
+                                        data-target="#modal-default">
+                                        Cerrar Toma 
+                                    </button>
+                                </div>
+                            </div>
+                            <br><br>
+                        </div>
+                        <div class="row row-cols-1 row-cols-md-3">
+                            <div class="col mb-4" *ngFor="let tomaInventarioDetalle of tomasInventarioDetalle">
+                                <div class="card" [class.border-info]="tomaInventarioDetalle.blanco"  [class.border-success]="!tomaInventarioDetalle.blanco" [class.border-warning]="tomaInventarioDetalle.error" style="border-width: 3px;">
+                                    <div class="card-header text-center ">
+                                        {{tomaInventarioDetalle.articulo}} <br>
+                                        <span class="text-muted">{{tomaInventarioDetalle.codigo}} - {{tomaInventarioDetalle.unidadMedida}}</span>
+                                    </div>
+                                    <div class="card-body ">
+                                        <p class="card-text">
+                                            <input type="number" #inputCantidad placeholder="Cantidad tomada" (blur)="onBlur(tomaInventarioDetalle,inputCantidad)" [value]="tomaInventarioDetalle.blanco?'':tomaInventarioDetalle.cantidad" class="form-control">
+                                        </p>
+                                    </div>
+                                    <div class=" modal-footer text-muted justify-content-between">
+                                        <span><b>Localización:</b> {{tomaInventarioDetalle.localizacion}} </span>
+                                        <i *ngIf="!tomaInventarioDetalle.blanco && !tomaInventarioDetalle.error" class="fas fa-cloud-upload-alt btn-outline-success"></i>
+                                        <i *ngIf="tomaInventarioDetalle.error" class="fas fa-exclamation-triangle btn-outline-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-default">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                
+                    <div class="modal-header">
+                        <h4 class="modal-title">Resumen</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <table class="table">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Articulo</th>
+                                    <th>Blanco</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let ttid of todoTomasInventarioDetalle">
+                                    <td>{{ttid.codigo}}</td>
+                                    <td>{{ttid.articulo}}</td>
+                                    <td>{{ttid.blanco?'Sí':'No'}}</td>
+                                    <td>{{ttid.cantidad}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"> Cancelar</button>
+                        <button type="button"  class="btn btn-primary" (click)="cerrarToma()"><i class="fa fa-save"></i>&nbsp;&nbsp;
+                            Cerrar Toma</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>

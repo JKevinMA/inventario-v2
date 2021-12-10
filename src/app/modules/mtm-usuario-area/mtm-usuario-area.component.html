@@ -1,0 +1,131 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Accesos de Usuarios a Áreas</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Mantenimiento</a></li>
+                    <li class="breadcrumb-item active">Accesos de Usuarios a Áreas</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-success" (click)="creando=true;" data-toggle="modal"
+                    data-target="#modal-default"><i class="fa fa-plus"></i>&nbsp;&nbsp; Nuevo Acceso </button>
+                <br><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Accesos</h3>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Nombres</th>
+                                    <th>Usuario</th>
+                                    <th>Área</th>
+                                    <th>Almacen</th>
+                                    <th>Local</th>
+                                    <th>Empresa</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let usuarioArea of usuariosArea">
+                                    <td>{{usuarioArea.nombre}}</td>
+                                    <td>{{usuarioArea.usuario}}</td>
+                                    <td>{{usuarioArea.area}}</td>
+                                    <td>{{usuarioArea.almacen}}</td>
+                                    <td>{{usuarioArea.local}}</td>
+                                    <td>{{usuarioArea.empresa}}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button (click)="eliminar(usuarioArea.usuarioId,usuarioArea.areaId)" type="button" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-default"  data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form autocomplete="off" id="formulario" (ngSubmit)="submit(formulario)"
+                    #formulario="ngForm">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{creando?'Nuevo':'Editando'}} Acceso</h4>
+                        <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select (change)="seleccionaEmpresa()" [(ngModel)]="usuarioArea.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (usuarioArea.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectLocal">Local</label>
+                            <select (change)="seleccionaLocal()" [(ngModel)]="usuarioArea.localId" name="Local" #Local="ngModel" class="form-control">
+                                <option value="0">Selecciona una Local</option>
+                                <option [value]="local.localId" *ngFor="let local of locales">{{local.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (usuarioArea.localId == 0) && Local.touched " class="error-custom">Seleccione el local</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectAlmacen">Almacen</label>
+                            <select (change)="seleccionaAlmacen()" [(ngModel)]="usuarioArea.almacenId" name="Almacen" #Almacen="ngModel" class="form-control">
+                                <option value="0">Selecciona una Almacen</option>
+                                <option [value]="almacen.almacenId" *ngFor="let almacen of almacenes">{{almacen.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (usuarioArea.almacenId == 0) && Almacen.touched " class="error-custom">Seleccione el almacen</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectArea">Área</label>
+                            <select  [(ngModel)]="usuarioArea.areaId" name="Area" #Area="ngModel" class="form-control">
+                                <option value="0">Selecciona un Área</option>
+                                <option [value]="area.areaId" *ngFor="let area of areas">{{area.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (usuarioArea.areaId == 0) && Area.touched " class="error-custom">Seleccione el área</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="selectUsuario">Usuario</label>
+                            <select  [(ngModel)]="usuarioArea.usuarioId" name="Usuario" #Usuario="ngModel" class="form-control">
+                                <option value="0">Selecciona un Usuario</option>
+                                <option [value]="usuario.usuarioId" *ngFor="let usuario of usuarios">{{usuario.usuario}}</option>
+                            </select>
+                            <span *ngIf=" (usuarioArea.usuarioId == 0) && Usuario.touched " class="error-custom">Seleccione el usuario</span>
+                        </div>
+                       
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()"> Cerrar</button>
+                        <button type="submit" [disabled]="formulario.invalid || usuarioArea.empresaId==0 || usuarioArea.localId == 0 || usuarioArea.almacenId == 0 || usuarioArea.areaId == 0 || usuarioArea.usuarioId == 0 " class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;&nbsp;
+                            Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

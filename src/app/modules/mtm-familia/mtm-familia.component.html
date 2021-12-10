@@ -1,0 +1,104 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Familias</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Mantenimiento</a></li>
+                    <li class="breadcrumb-item active">Familias</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-success" (click)="creando=true;" data-toggle="modal"
+                    data-target="#modal-default"><i class="fa fa-plus"></i>&nbsp;&nbsp; Nueva Familia</button>
+                <br><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Familias</h3>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre de familia</th>
+                                    <th>Empresa</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let familia of familias">
+                                    <td>{{familia.familiaId}}</td>
+                                    <td>{{familia.descripcion}}</td>
+                                    <td>{{familia.empresa}}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button (click)="editar(familia)" type="button" class="btn btn-warning" data-toggle="modal"
+                                            data-target="#modal-default">
+                                                <i class="fas fa-edit" ></i>
+                                            </button>
+                                            <button (click)="eliminar(familia.familiaId)" type="button" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-default"  data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form autocomplete="off" id="formulario" (ngSubmit)="submit(formulario)"
+                    #formulario="ngForm">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{creando?'Nueva':'Editando'}} Familia</h4>
+                        <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="inputDescripcion">Nombre de Familia</label>
+                            <input [class.is-invalid]="Familia.invalid && Familia.touched" type="text"
+                                #Familia="ngModel" [(ngModel)]="familia.descripcion" name="Familia" id="inputDescripcion"
+                                class="form-control" placeholder="Ingrese nombre de familia" required>
+                            <span *ngIf="Familia.invalid && Familia.touched " class="error-custom">Ingrese nombre de
+                                familia</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select [(ngModel)]="familia.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (familia.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()"> Cerrar</button>
+                        <button type="submit" [disabled]="formulario.invalid || familia.empresaId==0 " class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;&nbsp;
+                            Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

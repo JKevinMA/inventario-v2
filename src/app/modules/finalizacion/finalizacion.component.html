@@ -1,0 +1,331 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Finalizacion de Inventario</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Inventario</a></li>
+                    <li class="breadcrumb-item active">Finalizacion de Inventario</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-sm-12">
+                <div class="card card-primary  card-tabs">
+                  <div class="card-header p-0 pt-1 border-bottom-0">
+                    <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                      <li class="nav-item">
+                        <a class="nav-link active" id="custom-tabs-three-inventarios-abiertos-tab" data-toggle="pill" href="#custom-tabs-inventarios-abiertos-home" role="tab" aria-controls="custom-tabs-inventarios-abiertos-home" aria-selected="false">Inventarios Aperturados</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link " id="custom-tabs-three-inventarios-cerrados-tab" data-toggle="pill" href="#custom-tabs-three-inventarios-abiertos" role="tab" aria-controls="custom-tabs-three-inventarios-abiertos" aria-selected="true">Inventarios Cerrados</a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="card-body p-0 table-responsive">
+                    <div class="tab-content " id="custom-tabs-three-tabContent">
+                      <div class="tab-pane fade active show" id="custom-tabs-inventarios-abiertos-home" role="tabpanel" aria-labelledby="custom-tabs-three-inventarios-abiertos-tab">
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Almacen</th>
+                                    <th>Area</th>
+                                    <th>Tipo de Inventario</th>
+                                    <th>Fecha Aperturado</th>
+                                    <th>Hora Aperturado</th>
+                                    <th>Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="inventariosAbiertos.length==0">
+                                   <td colspan="7" class="text-center">No existen inventarios aperturados por finalizar</td> 
+                                </tr>
+                                <tr *ngFor="let inventarioAbierto of inventariosAbiertos"
+                                    [class.table-success]="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
+                                    <td>{{inventarioAbierto.inventarioId}}</td>
+                                    <td>{{inventarioAbierto.almacen}}</td>
+                                    <td>{{inventarioAbierto.area}}</td>
+                                    <td>{{inventarioAbierto.tipoInventario}}</td>
+                                    <td>{{inventarioAbierto.fechaInicio | date:"mediumDate"}}</td>
+                                    <td>{{inventarioAbierto.fechaInicio | date:"shortTime"}}</td>
+                                    <td>
+                                        <button class="btn btn-primary" type="button" [disabled]="paso_2"
+                                            (click)="forzarYObtenerTomasUsuarios(inventarioAbierto)"
+                                            *ngIf="inventarioSeleccionado.inventarioId!=inventarioAbierto.inventarioId">Forzar
+                                            Cierre</button>
+                                        <button class="btn btn-success" [disabled]="paso_2"
+                                            *ngIf="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
+                                            En curso
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="custom-tabs-three-inventarios-abiertos" role="tabpanel" aria-labelledby="custom-tabs-three-inventarios-cerrados-tab">
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Almacen</th>
+                                    <th>Area</th>
+                                    <th>Tipo de Inventario</th>
+                                    <th>Fecha Finalizado</th>
+                                    <th>Hora Finalizado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="inventariosCerrados.length==0">
+                                   <td colspan="6" class="text-center">No se encontraron Inventarios Cerrados</td> 
+                                </tr>
+                                <tr *ngFor="let inventarioCerrado of inventariosCerrados">
+                                    <td>{{inventarioCerrado.inventarioId}}</td>
+                                    <td>{{inventarioCerrado.almacen}}</td>
+                                    <td>{{inventarioCerrado.area}}</td>
+                                    <td>{{inventarioCerrado.tipoInventario}}</td>
+                                    <td>{{inventarioCerrado.fechaFin | date:"mediumDate"}}</td>
+                                    <td>{{inventarioCerrado.fechaFin | date:"shortTime"}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <!-- <div class="col-md-12">
+                <div class="card " [class.card-primary]="paso_1" [class.card-secondary]="paso_2">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de inventarios aperturados </h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Almacen</th>
+                                    <th>Area</th>
+                                    <th>Tipo de Inventario</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let inventarioAbierto of inventariosAbiertos"
+                                    [class.table-success]="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
+                                    <td>{{inventarioAbierto.inventarioId}}</td>
+                                    <td>{{inventarioAbierto.almacen}}</td>
+                                    <td>{{inventarioAbierto.area}}</td>
+                                    <td>{{inventarioAbierto.tipoInventario}}</td>
+                                    <td>{{inventarioAbierto.fechaInicio | date:"mediumDate"}}</td>
+                                    <td>{{inventarioAbierto.fechaInicio | date:"shortTime"}}</td>
+                                    <td>
+                                        <button class="btn btn-primary" type="button" [disabled]="paso_2"
+                                            (click)="forzarYObtenerTomasUsuarios(inventarioAbierto)"
+                                            *ngIf="inventarioSeleccionado.inventarioId!=inventarioAbierto.inventarioId">Forzar
+                                            Cierre</button>
+                                        <button class="btn btn-success" [disabled]="paso_2"
+                                            *ngIf="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
+                                            En curso
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        <div class="row" *ngIf="paso_2">
+            <div [class.col-md-9]="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' "
+                [class.col-md-12]="inventarioSeleccionado.archivoStock == null || inventarioSeleccionado.archivoStock == '-' ">
+                <div class="card " [class.card-primary]="paso_2" [class.card-secondary]="paso_1">
+                    <div class="card-header">
+                        <h3 class="card-title">Usuarios que tomaron inventario </h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Nombre</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
+                                    <th>Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let lTIC of tomasInventarioUsuario">
+                                    <td>{{lTIC.usuario}}</td>
+                                    <td>{{lTIC.nombre}}</td>
+                                    <td>{{lTIC.fechaInicio|date:"medium"}}</td>
+                                    <td *ngIf="lTIC.cerrado">{{lTIC.fechaFin |date:"medium" }}</td>
+                                    <td *ngIf="!lTIC.cerrado">-</td>
+                                    <td> <button class="btn btn-success" data-toggle="modal"
+                                            data-target="#modal-detalle"
+                                            (click)="obtenerTomaDetalle(lTIC.tomaInventarioId)"> <i
+                                                class="far fa-eye"></i></button> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="modal-footer" *ngIf="inventarioSeleccionado.archivoStock == '-'">
+                            <button type="button" (click)="finalizar()" [disabled]="paso_1" class="btn btn-success">
+                                Finalizar</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-3"
+                *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' ">
+                <div>
+                    <div class="alert alert-info alert-dismissible table-responsive p-0">
+                        <div class="p-3 d-flex justify-content-between">
+                            <h5><i class="icon fas fa-info"></i> Stock teórico cargado</h5>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <th>Valor Teórico</th>
+                                <td class="text-right">{{valorTeorico | currency:'S/. '}}</td>
+                            </tr>
+                            <tr>
+                                <th>Valor Físico</th>
+                                <td class="text-right">{{valorFisico | currency:'S/. '}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row"
+            *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' ">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Validando Inventario </h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Articulo</th>
+                                    <th>Stock Teorico</th>
+                                    <th>Stock Fisico</th>
+                                    <th>Faltante</th>
+                                    <th>Diferencia Valor</th>
+                                    <th>Validar</th>
+                                    <th>Faltante Final</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let id of inventarioDetalle">
+                                    <td>{{id.codigo}}</td>
+                                    <td>{{id.articulo}}</td>
+                                    <td class="text-right">{{id.stockTeorico}}</td>
+                                    <td class="text-right">{{id.cantidad}}</td>
+                                    <td class="text-right">{{id.faltante}}</td>
+                                    <td class="text-right">{{id.absValDif | currency:'S/. '}}</td>
+                                    <td>
+                                        <input (change)="cambiaValorValidacion(id)" type="number"
+                                            [(ngModel)]="id.cantidadValidado" class="form-control">
+                                    </td>
+                                    <td>{{id.diferencia}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="modal-footer ">
+                            <button type="button" (click)="finalizar()" [disabled]="paso_1" class="btn btn-success">
+                                Validar y Finalizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-detalle">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Detalle de toma de inventario</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0 table-responsive">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Artículo</th>
+                                <th>Blanco</th>
+                                <th>Unidad de Medida</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let det of tomaInventarioDetalle">
+                                <td>{{det.codigo}}</td>
+                                <td>{{det.articulo}}</td>
+                                <td>{{det.blanco?'Sí':'No'}}</td>
+                                <td>{{det.unidadMedida}}</td>
+                                <td>{{det.cantidad}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-validacion">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Detalle de toma de inventario</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0 table-responsive">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Artículo</th>
+                                <th>Blanco</th>
+                                <th>Unidad de Medida</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let det of tomaInventarioDetalle">
+                                <td>{{det.codigo}}</td>
+                                <td>{{det.articulo}}</td>
+                                <td>{{det.blanco?'Sí':'No'}}</td>
+                                <td>{{det.unidadMedida}}</td>
+                                <td>{{det.cantidad}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

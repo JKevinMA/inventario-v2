@@ -1,0 +1,207 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Articulos</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Mantenimiento</a></li>
+                    <li class="breadcrumb-item active">Articulos</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 d-flex justify-content-between">
+                <button type="button" class="btn btn-success" (click)="creando=true;" data-toggle="modal"
+                    data-target="#modal-default"><i class="fa fa-plus"></i>&nbsp;&nbsp; Nuevo Articulo</button>
+                <button type="button" data-toggle="modal" data-target="#modal-carga-masiva"
+                    class="btn btn-outline-success"><i class="fa fa-upload"></i>&nbsp;&nbsp; Carga Masiva de
+                    Articulo</button>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Articulos</h3>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-sm" class="table row-border hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Barcode</th>
+                                    <th>Articulo</th>
+                                    <th>Unidad de Medida</th>
+                                    <th>Categoria</th>
+                                    <th>Familia</th>
+                                    <th>Empresa</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let articulo of articulos">
+                                    <td>{{articulo.codigo}}</td>
+                                    <td>{{articulo.barcode}}</td>
+                                    <td>{{articulo.descripcion}}</td>
+                                    <td>{{articulo.unidadMedida}}</td>
+                                    <td>{{articulo.categoria}}</td>
+                                    <td>{{articulo.familia}}</td>
+                                    <td>{{articulo.empresa}}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button (click)="editar(articulo)" type="button" class="btn btn-warning"
+                                                data-toggle="modal" data-target="#modal-default">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button (click)="eliminar(articulo.articuloId)" type="button"
+                                                class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-default" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form autocomplete="off" id="formulario" (ngSubmit)="submit(formulario)"
+                    #formulario="ngForm">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{creando?'Nuevo':'Editando'}} Articulo</h4>
+                        <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="inputCodigo">Codigo de Articulo</label>
+                            <input [class.is-invalid]="Codigo.invalid && Codigo.touched" type="text"
+                                #Codigo="ngModel" [(ngModel)]="articulo.codigo" name="Codigo" id="inputCodigo"
+                                class="form-control" placeholder="Ingrese codigo de articulo" required>
+                            <span *ngIf="Codigo.invalid && Codigo.touched " class="error-custom">Ingrese codigo de
+                                articulo</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputBarcode">Barcode</label>
+                            <input [class.is-invalid]="Barcode.invalid && Barcode.touched" type="text"
+                                #Barcode="ngModel" [(ngModel)]="articulo.barcode" name="Barcode" id="inputBarcode"
+                                class="form-control" placeholder="Ingrese barcode de articulo" required>
+                            <span *ngIf="Barcode.invalid && Barcode.touched " class="error-custom">Ingrese barcode de
+                                articulo</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputDescripcion">Nombre de Articulo</label>
+                            <input [class.is-invalid]="Articulo.invalid && Articulo.touched" type="text"
+                                #Articulo="ngModel" [(ngModel)]="articulo.descripcion" name="Articulo" id="inputArticulo"
+                                class="form-control" placeholder="Ingrese nombre de articulo" required>
+                            <span *ngIf="Articulo.invalid && Articulo.touched " class="error-custom">Ingrese nombre de
+                                articulo</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="selectUnidadMedida">Unidad de Medida</label>
+                            <select [(ngModel)]="articulo.unidadMedidaId" name="UnidadMedida" #UnidadMedida="ngModel"  class="form-control">
+                                <option value="0">Selecciona una UnidadMedida</option>
+                                <option [value]="unidadMedida.unidadMedidaId" *ngFor="let unidadMedida of unidadesMedida">{{unidadMedida.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articulo.unidadMedidaId == 0) && UnidadMedida.touched " class="error-custom">Seleccione la unidad de medida</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectEmpresa">Empresa</label>
+                            <select (change)="seleccionaEmpresa()" [(ngModel)]="articulo.empresaId" name="Empresa" #Empresa="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Empresa</option>
+                                <option [value]="empresa.empresaId" *ngFor="let empresa of empresas">{{empresa.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articulo.empresaId == 0) && Empresa.touched " class="error-custom">Seleccione la empresa</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectCategoria">Categoria</label>
+                            <select [(ngModel)]="articulo.categoriaId" name="Categoria" #Categoria="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Categoria</option>
+                                <option [value]="categoria.categoriaId" *ngFor="let categoria of categorias">{{categoria.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articulo.categoriaId == 0) && Categoria.touched " class="error-custom">Seleccione la categoria</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectFamilia">Familia</label>
+                            <select [(ngModel)]="articulo.familiaId" name="Familia" #Familia="ngModel"  class="form-control">
+                                <option value="0">Selecciona una Familia</option>
+                                <option [value]="familia.familiaId" *ngFor="let familia of familias">{{familia.descripcion}}</option>
+                            </select>
+                            <span *ngIf=" (articulo.familiaId == 0) && Familia.touched " class="error-custom">Seleccione la familia</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()"> Cerrar</button>
+                        <button type="submit" [disabled]="formulario.invalid || articulo.categoriaId==0 || articulo.empresaId==0 || articulo.familiaId==0 || articulo.unidadMedidaId==0" class="btn btn-primary"><i class="fa fa-save"></i>&nbsp;&nbsp;
+                            Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-carga-masiva">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                
+                    <div class="modal-header">
+                        <h4 class="modal-title">Carga Masiva de Articulos</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body table-responsive p-0">
+                        <div class="p-3">
+                            <input type="file"  appReadexcel #myInputFile
+                            (eventEmitter)="DataFromEventEmmiter($event)">
+                        </div>
+
+                        <table class="table">
+                            <thead class="thead-light"> 
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Barcode</th>
+                                    <th>Descripcion</th>
+                                    <th>UnidadMedidaId</th>
+                                    <th>CategoriaId</th>
+                                    <th>FamiliaId</th>
+                                    <th>EmpresaId</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let ac of articulosCarga">
+                                    <td>{{ac.codigo}}</td>
+                                    <td>{{ac.barcode}}</td>
+                                    <td>{{ac.descripcion}}</td>
+                                    <td>{{ac.unidadMedidaId}}</td>
+                                    <td>{{ac.categoriaId}}</td>
+                                    <td>{{ac.familiaId}}</td>
+                                    <td>{{ac.empresaId}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Cerrar</button>
+                        <button [disabled]="articulosCarga?.length==0"  type="button" (click)="cargaArticulos()" class="btn btn-primary"><i
+                                class="fa fa-upload"  ></i>&nbsp;&nbsp;
+                            Cargar data</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
