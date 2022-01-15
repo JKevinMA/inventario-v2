@@ -1,6 +1,6 @@
-import { Component, ElementRef, EventEmitter, OnInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { ReadexcelDirective } from 'src/app/directives/readexcel.directive';
 import { Almacen } from 'src/app/models/almacen.model';
 import { Area } from 'src/app/models/area.model';
@@ -17,7 +17,7 @@ import Swal from 'sweetalert2';
   templateUrl: './apertura.component.html',
   styleUrls: ['./apertura.component.css']
 })
-export class AperturaComponent implements OnInit {
+export class AperturaComponent implements OnInit,OnDestroy {
 
   user!: UsuarioModel;
   locales!: Local[];
@@ -34,20 +34,24 @@ export class AperturaComponent implements OnInit {
   paso_2 = false;
 
   dtOptions: DataTables.Settings = {};
+  dtTrigger: Subject<any> = new Subject<any>();
 
   readExcel!: ReadexcelDirective;
   @ViewChild('myInputFile')
   myInputFile!: ElementRef;
   constructor(private api: ApiService) { }
+  ngOnDestroy(): void {
+    this.dtTrigger.unsubscribe();
+  }
 
   ngOnInit(): void {
-    
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      responsive:true
+    };
     this.obtenerUsuario();
     this.cargarControles();
     this.area.articulos = [];
-    this.dtOptions = {
-      pagingType: 'full_numbers'
-    };
   }
 
   cargarControles() {
@@ -117,6 +121,7 @@ export class AperturaComponent implements OnInit {
     this.area.articulos = [];
 
     this.area = { ...area };
+    this.dtTrigger.next();
   }
 
   DataFromEventEmmiter(o: any) {

@@ -29,7 +29,7 @@
                       </li>
                     </ul>
                   </div>
-                  <div class="card-body p-0 table-responsive">
+                  <div class="card-body  table-responsive">
                     <div class="tab-content " id="custom-tabs-three-tabContent">
                       <div class="tab-pane fade active show" id="custom-tabs-inventarios-abiertos-home" role="tabpanel" aria-labelledby="custom-tabs-three-inventarios-abiertos-tab">
                         <table class="table row-border hover ">
@@ -71,7 +71,7 @@
                         </table>
                       </div>
                       <div class="tab-pane fade" id="custom-tabs-three-inventarios-abiertos" role="tabpanel" aria-labelledby="custom-tabs-three-inventarios-cerrados-tab">
-                        <table class="table row-border hover ">
+                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
                                     <th>ID</th>
@@ -80,6 +80,7 @@
                                     <th>Tipo de Inventario</th>
                                     <th>Fecha Finalizado</th>
                                     <th>Hora Finalizado</th>
+                                    <th>Resumen</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -93,6 +94,15 @@
                                     <td>{{inventarioCerrado.tipoInventario}}</td>
                                     <td>{{inventarioCerrado.fechaFin | date:"mediumDate"}}</td>
                                     <td>{{inventarioCerrado.fechaFin | date:"shortTime"}}</td>
+                                    <td>
+                                        <button *ngIf="inventarioSeleccionado.inventarioId!=inventarioCerrado.inventarioId" type="button" class="btn btn-primary" [disabled]="paso_2" (click)="verResumen(inventarioCerrado)">Ver Resumen</button>
+                                        
+                                        <button class="btn btn-success" [disabled]="paso_2"
+                                            *ngIf="inventarioSeleccionado.inventarioId==inventarioCerrado.inventarioId">
+                                            En curso
+                                        </button>
+                                    </td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -151,7 +161,7 @@
                 [class.col-md-12]="inventarioSeleccionado.archivoStock == null || inventarioSeleccionado.archivoStock == '-' ">
                 <div class="card " [class.card-primary]="paso_2" [class.card-secondary]="paso_1">
                     <div class="card-header">
-                        <h3 class="card-title">Usuarios que tomaron inventario </h3>
+                        <h3 class="card-title">Usuarios que tomaron inventario - InventarioID: {{inventarioSeleccionado.inventarioId}} </h3>
                     </div>
                     <div class="card-body table-responsive p-0">
                         <table class="table row-border hover ">
@@ -178,8 +188,8 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="modal-footer" *ngIf="inventarioSeleccionado.archivoStock == '-'">
-                            <button type="button" (click)="finalizar()" [disabled]="paso_1" class="btn btn-success">
+                        <div class="modal-footer" *ngIf="inventarioSeleccionado.archivoStock == '-' && !esResumen">
+                            <button  type="button" (click)="finalizar()" [disabled]="paso_1" class="btn btn-success">
                                 Finalizar</button>
                         </div>
                     </div>
@@ -212,7 +222,7 @@
             <div class="col-md-12">
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Validando Inventario </h3>
+                        <h3 class="card-title">Validando Inventario - InventarioID: {{inventarioSeleccionado.inventarioId}}</h3>
                     </div>
                     <div class="card-body table-responsive p-0">
                         <table class="table row-border hover ">
@@ -237,7 +247,7 @@
                                     <td class="text-right">{{id.faltante}}</td>
                                     <td class="text-right">{{id.absValDif | currency:'S/. '}}</td>
                                     <td>
-                                        <input (change)="cambiaValorValidacion(id)" type="number"
+                                        <input [readonly]="esResumen" (change)="cambiaValorValidacion(id)" type="number"
                                             [(ngModel)]="id.cantidadValidado" class="form-control">
                                     </td>
                                     <td>{{id.diferencia}}</td>
@@ -245,7 +255,7 @@
                             </tbody>
                         </table>
 
-                        <div class="modal-footer ">
+                        <div class="modal-footer " *ngIf="!esResumen">
                             <button type="button" (click)="finalizar()" [disabled]="paso_1" class="btn btn-success">
                                 Validar y Finalizar</button>
                         </div>

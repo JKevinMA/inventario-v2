@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
 import { InventarioCabecera } from 'src/app/models/inventario.model';
 import { TomaInventarioCabecera, TomaInventarioDetalle } from 'src/app/models/toma-inventario.model';
 import { UsuarioModel } from 'src/app/models/usuario.model';
@@ -10,7 +11,7 @@ import Swal from 'sweetalert2';
   templateUrl: './toma.component.html',
   styleUrls: ['./toma.component.css']
 })
-export class TomaComponent implements OnInit {
+export class TomaComponent implements OnInit,OnDestroy {
   user!: UsuarioModel;
   inventariosAbiertos:InventarioCabecera[]=[];
 
@@ -22,6 +23,10 @@ export class TomaComponent implements OnInit {
   localizaciones:string[] = [];
   familias:string[] = [];
   categorias:string[] = [];
+
+  dtOptions: DataTables.Settings = {};
+  dtTrigger: Subject<any> = new Subject<any>();
+
 
   constructor(private api:ApiService) { }
 
@@ -36,10 +41,22 @@ export class TomaComponent implements OnInit {
   stopLoading(){
     Swal.close();
   }
+  ngOnDestroy(): void {
+    this.dtTrigger.unsubscribe();
+  }
 
   ngOnInit(): void {
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      responsive:true
+    };
     this.obtenerUsuario();
     this.obtenerInventariosAbiertos();
+  }
+
+  verResumen(){
+    /* this.dtTrigger.lift;
+    this.dtTrigger.next(); */
   }
 
   obtenerInventariosAbiertos(){
@@ -181,6 +198,7 @@ export class TomaComponent implements OnInit {
   }
 
   cerrarToma(){
+    
     Swal.fire({
       title: 'Confirmación',
       text: 'Seguro de cerrar la toma de inventario?',

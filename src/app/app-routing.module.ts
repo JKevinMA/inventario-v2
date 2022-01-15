@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 import { AperturaComponent } from './modules/apertura/apertura.component';
 import { FinalizacionComponent } from './modules/finalizacion/finalizacion.component';
 import { MtmAlmacenComponent } from './modules/mtm-almacen/mtm-almacen.component';
@@ -26,6 +27,7 @@ const routes: Routes = [
     component: LoginComponent
   },
   {
+    canActivate:[AuthGuard],
     path:'',
     component:InicioComponent,
     children:[
@@ -103,11 +105,14 @@ const routes: Routes = [
 
       }
     ]
+  },
+  {
+    path: '**', redirectTo:'/login',pathMatch:'full'
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes,{useHash:true})],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

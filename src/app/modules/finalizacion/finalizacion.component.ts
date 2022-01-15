@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { combineLatest } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { combineLatest, Subject } from 'rxjs';
 import { InventarioCabecera, InventarioDetalle } from 'src/app/models/inventario.model';
 import { TomaInventarioCabecera, TomaInventarioDetalle } from 'src/app/models/toma-inventario.model';
 import { UsuarioModel } from 'src/app/models/usuario.model';
@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
   templateUrl: './finalizacion.component.html',
   styleUrls: ['./finalizacion.component.css']
 })
-export class FinalizacionComponent implements OnInit {
+export class FinalizacionComponent implements OnInit,OnDestroy {
 
   paso_1 = true;
   paso_2 = false;
@@ -29,6 +29,15 @@ export class FinalizacionComponent implements OnInit {
   valorTeorico:number=0;
   valorFisico:number=0;
 
+
+  dtOptions: DataTables.Settings = {};
+  dtTrigger: Subject<any> = new Subject<any>();
+
+  esResumen=false;
+
+  ngOnDestroy(): void {
+    this.dtTrigger.unsubscribe();
+  }
   constructor(private api: ApiService) { }
   isLoading() {
     Swal.fire({
@@ -43,11 +52,15 @@ export class FinalizacionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      responsive:true
+    };
     this.obtenerUsuario();
-    this.obtenerInventariosAbiertos();
+    this.obtenerInventarios();
   }
 
-  obtenerInventariosAbiertos() {
+  obtenerInventarios() {
     this.isLoading();
     combineLatest([
       this.api.obtenerInventariosAbiertos(this.user.usuarioId,'APERTURADO'),
@@ -58,6 +71,7 @@ export class FinalizacionComponent implements OnInit {
       }
       if (res2.success) {
         this.inventariosCerrados = res2.response!;
+        this.dtTrigger.next();
       }
       this.stopLoading();
     });
@@ -71,6 +85,7 @@ export class FinalizacionComponent implements OnInit {
   }
 
   forzarYObtenerTomasUsuarios(ia: InventarioCabecera) {
+    this.esResumen =false;
     this.paso_1 = false;
     this.paso_2 = true;
     Swal.fire({
@@ -127,6 +142,25 @@ export class FinalizacionComponent implements OnInit {
       }
     });
 
+  }
+
+  verResumen(ia: InventarioCabecera){
+    this.esResumen =true;
+    this.isLoading();
+    this.paso_1 = false;
+    this.paso_2 = true;
+    this.inventarioSeleccionado = ia;
+        this.api.cerrarYObtenerTomasInventarioUsuarios(this.inventarioSeleccionado.inventarioId).subscribe(r => {
+          if (r.success) {
+            this.tomasInventarioUsuario = r.response!;
+            this.paso_2 = true;
+            this.paso_1 = false;
+          }
+          this.stopLoading();
+          if (this.inventarioSeleccionado.archivoStock != "-") {
+            this.obtenerDataValidacion(this.inventarioSeleccionado);
+          }
+        });
   }
 
   obtenerTomaDetalle(tomaInventarioId: number) {

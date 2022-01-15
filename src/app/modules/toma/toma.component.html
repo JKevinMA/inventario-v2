@@ -120,7 +120,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <button [disabled]="paso_1" id="select" type="button"
-                                        class="btn btn-success btn-block" data-toggle="modal"
+                                        class="btn btn-success btn-block" (click)="verResumen()" data-toggle="modal"
                                         data-target="#modal-default">
                                         Cerrar Toma 
                                     </button>
@@ -163,8 +163,9 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body p-0">
-                        <table class="table">
+                    <div class="modal-body table-responsive">
+                        <!-- <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover"> -->
+                            <table class="table" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Codigo</th>
