@@ -32,14 +32,14 @@
                         <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>ID</th>
+                                   <!--  <th>ID</th> -->
                                     <th>Tipo de Inventario</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let tipoInventario of tiposInventario">
-                                    <td>{{tipoInventario.tipoInventarioId}}</td>
+                                    <!-- <td>{{tipoInventario.tipoInventarioId}}</td> -->
                                     <td>{{tipoInventario.descripcion}}</td>
                                     <td class="text-center">
                                         <div class="btn-group">

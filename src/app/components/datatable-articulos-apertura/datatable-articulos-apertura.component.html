@@ -1,0 +1,25 @@
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+    <thead class="thead-light">
+        <tr>
+            <th>Codigo</th>
+            <th>Articulo</th>
+            <th>Stock Teorico</th>
+            <th>Precio Promedio</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngIf="articulos.length==0">
+            <td colspan="4">
+                <p class="text-center">
+                    No se encontraron articulos
+                </p>
+            </td>
+        </tr>
+        <tr *ngFor="let articulo of articulos">
+            <td>{{articulo.codigo}}</td>
+            <td>{{articulo.descripcion}}</td>
+            <td>{{articulo.stockTeorico}}</td>
+            <td class="text-right">{{articulo.precioPromedio | currency:'S/. '}}</td>
+        </tr>
+    </tbody>
+</table>

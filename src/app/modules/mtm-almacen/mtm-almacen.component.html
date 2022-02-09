@@ -32,7 +32,7 @@
                         <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-sm" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>ID</th>
+                                    <!-- <th>ID</th> -->
                                     <th>Nombre de almacen</th>
                                     <th>Local</th>
                                     <th>Empresa</th>
@@ -41,7 +41,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let almacen of almacenes">
-                                    <td>{{almacen.almacenId}}</td>
+                                    <!-- <td>{{almacen.almacenId}}</td> -->
                                     <td>{{almacen.descripcion}}</td>
                                     <td>{{almacen.local}}</td>
                                     <td>{{almacen.empresa}}</td>

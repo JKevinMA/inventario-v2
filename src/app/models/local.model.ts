@@ -3,4 +3,5 @@ export class Local{
     descripcion!:string;
     empresaId!:number;
     empresa!:string;
+    habilitado:boolean=false;
 }

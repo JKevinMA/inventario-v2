@@ -7,6 +7,7 @@ export class UsuarioModel{
     administrador!:boolean;
     supervisor!:boolean;
     inventario!:boolean;
+    su!:number;
     nombre!:string;
 
     empresa!:string;

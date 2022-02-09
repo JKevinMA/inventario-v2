@@ -8,6 +8,7 @@ import { Articulo } from 'src/app/models/articulo.model';
 import { Empresa } from 'src/app/models/empresa.model';
 import { Local } from 'src/app/models/local.model';
 import { TipoInventario } from 'src/app/models/tipo-inventario.model';
+import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ApiService } from 'src/app/services/api.service';
 import Swal from 'sweetalert2';
 
@@ -17,6 +18,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./mtm-articulo-tipo-inventario.component.css']
 })
 export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
+  user!: UsuarioModel;
 
   articulosTipoInventario:ArticuloTipoInventario[] =[];
   articuloTipoInventario:ArticuloTipoInventario= new ArticuloTipoInventario();
@@ -41,6 +43,7 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
     this.dtTrigger.unsubscribe();
   }
  ngOnInit(): void {
+  this.obtenerUsuario();
     this.reiniciar();
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -48,7 +51,12 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
     };
     this.obtener();
   }
-
+  obtenerUsuario() {
+    var objectUser = localStorage.getItem('user-inventario-application');
+    if (objectUser != null) {
+      this.user = JSON.parse(objectUser);
+    }
+  }
   isLoading(){
     Swal.fire({
       allowOutsideClick: false,
@@ -64,10 +72,11 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
   obtener(){
     this.isLoading();
     combineLatest([
-      this.api.obtenerArticulosTipoInventarioMTM(),
-      this.api.obtenerEmpresas(),
+      this.api.obtenerArticulosTipoInventarioMTM(this.user.su),
+      this.api.obtenerEmpresas(this.user.su),
       this.api.obtenerTiposInventarioMTM(),
     ]).subscribe(([res1,res2,res3])=>{
+      console.log(res1);
       if(res1.success){
         this.articulosTipoInventario = res1.response!;
         this.dtTrigger.next();
@@ -93,7 +102,7 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
   editar(o:ArticuloTipoInventario){
     this.creando=false;
     this.articuloTipoInventario = {...o};
-
+    console.log(o);
     this.traerLocales();
     this.traerAlmacenes();
     this.traerAreas();
@@ -218,9 +227,13 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
               window.location.reload();
             });
           } else {
+            var message:string;
+            var flag:number;
+            message = r.message!;
+            flag = message.search('REFERENCE constraint');
             Swal.fire({
               title: 'Error',
-              text: r.message,
+              text: flag==0?r.message:'No se puede eliminar el item porque está siendo usado en otros registros.',
               icon: 'error'
             });
           }

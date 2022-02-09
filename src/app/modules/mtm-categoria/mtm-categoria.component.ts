@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { combineLatest, Subject } from 'rxjs';
 import { Categoria } from 'src/app/models/categoria.model';
 import { Empresa } from 'src/app/models/empresa.model';
+import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ApiService } from 'src/app/services/api.service';
 import Swal from 'sweetalert2';
 
@@ -12,7 +13,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./mtm-categoria.component.css']
 })
 export class MtmCategoriaComponent implements OnInit ,OnDestroy {
-
+  user!: UsuarioModel;
+  
   categorias:Categoria[] =[];
   categoria:Categoria= new Categoria();
   deleteId:number=0;
@@ -41,12 +43,17 @@ export class MtmCategoriaComponent implements OnInit ,OnDestroy {
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
   }
-  
+  obtenerUsuario() {
+    var objectUser = localStorage.getItem('user-inventario-application');
+    if (objectUser != null) {
+      this.user = JSON.parse(objectUser);
+    }
+  }
   obtener(){
     this.isLoading();
     combineLatest([
-      this.api.obtenerCategorias(),
-      this.api.obtenerEmpresas()
+      this.api.obtenerCategorias(this.user.su),
+      this.api.obtenerEmpresas(this.user.su)
     ]).subscribe(([res1,res2])=>{
       if(res1.success){
         this.categorias = res1.response!;
@@ -62,6 +69,7 @@ export class MtmCategoriaComponent implements OnInit ,OnDestroy {
 
 
   ngOnInit(): void {
+    this.obtenerUsuario();
     this.reiniciar();
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -193,9 +201,13 @@ export class MtmCategoriaComponent implements OnInit ,OnDestroy {
               window.location.reload();
             });
           } else {
+            var message:string;
+            var flag:number;
+            message = r.message!;
+            flag = message.search('REFERENCE constraint');
             Swal.fire({
               title: 'Error',
-              text: r.message,
+              text: flag==0?r.message:'No se puede eliminar el item porque está siendo usado en otros registros.',
               icon: 'error'
             });
           }

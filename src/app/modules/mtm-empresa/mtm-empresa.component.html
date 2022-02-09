@@ -32,14 +32,12 @@
                         <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Nombre de empresa</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let empresa of empresas">
-                                    <td>{{empresa.empresaId}}</td>
                                     <td>{{empresa.descripcion}}</td>
                                     <td class="text-center">
                                         <div class="btn-group">

@@ -32,11 +32,10 @@
                         <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Nombres</th>
                                     <th>Usuario</th>
-                                    <th>Clave</th>
-                                    <th>Adminstrador</th>
+                                    <!-- <th>Clave</th> -->
+                                    <th>Administrador</th>
                                     <th>Supervisor</th>
                                     <th>Inventariador</th>
                                     <th>Empresa</th>
@@ -45,10 +44,9 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let usuario of usuarios">
-                                    <td>{{usuario.usuarioId}}</td>
                                     <td>{{usuario.nombre}}</td>
                                     <td>{{usuario.usuario}}</td>
-                                    <td>{{usuario.clave}}</td>
+                                    <!-- <td>{{usuario.clave}}</td> -->
                                     <td>{{usuario.administrador? 'Sí':'No'}}</td>
                                     <td>{{usuario.supervisor? 'Sí':'No'}}</td>
                                     <td>{{usuario.inventario? 'Sí':'No'}}</td>

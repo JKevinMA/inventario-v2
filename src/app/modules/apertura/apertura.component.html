@@ -99,16 +99,17 @@
                                                         <th style="width: 100px;">Seleccionar</th>
                                                         <th>Subir Stock Teorico</th>
                                                         <th>Area</th>
+                                                        <th>N° Articulos</th>
                                                         <th>Archivo</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr *ngFor="let ar of almacen.areas;let i = index;">
-                                                        <td class="text-center"> <input class="form-check-input"
-                                                                [(ngModel)]="ar.selected"  name="cbg_area_{{ar.areaId}}" type="checkbox"></td>
+                                                        <td disabled="ar.articulos.length==0" class="text-center"> <input class="form-check-input"
+                                                                [(ngModel)]="ar.selected" [disabled]="ar.articulos?.length==0" name="cbg_area_{{ar.areaId}}" type="checkbox"></td>
                                                         <td style="width: 20px;">
                                                             <button type="button" class="btn btn-info"
-                                                                data-toggle="modal" (click)="verArticulos(ar)"
+                                                                data-toggle="modal" [disabled]="ar.articulos?.length==0" (click)="verArticulos(ar)"
                                                                 data-target="#modal-default">
                                                                 <i class="fas fa-file-upload"></i>
                                                             </button>
@@ -116,6 +117,7 @@
                                                         <td>
                                                             {{ar.descripcion}}
                                                         </td>
+                                                        <td>{{ar.articulos?.length}}</td>
                                                         <td>
                                                             {{ar.archivo}}
                                                         </td>
@@ -201,7 +203,7 @@
                         </tbody>
                     </table>
 
-                    
+                    <!-- <app-datatable-articulos-apertura [articulos]="area.articulos" ></app-datatable-articulos-apertura> -->
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal" (click)="cerrarModal()">

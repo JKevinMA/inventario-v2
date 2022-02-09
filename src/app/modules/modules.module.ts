@@ -19,6 +19,7 @@ import { MtmCategoriaComponent } from './mtm-categoria/mtm-categoria.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataTablesModule } from 'angular-datatables';
 import { ReadexcelDirective } from '../directives/readexcel.directive';
+import { ComponentsModule } from '../components/components.module';
 
 
 
@@ -46,7 +47,8 @@ import { ReadexcelDirective } from '../directives/readexcel.directive';
     FormsModule,
     ReactiveFormsModule,
     NgbModule,
-    DataTablesModule
+    DataTablesModule,
+    ComponentsModule
   ],
   exports:[
     AperturaComponent,

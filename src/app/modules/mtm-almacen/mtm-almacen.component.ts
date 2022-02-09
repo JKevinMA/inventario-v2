@@ -4,6 +4,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { Almacen } from 'src/app/models/almacen.model';
 import { Empresa } from 'src/app/models/empresa.model';
 import { Local } from 'src/app/models/local.model';
+import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ApiService } from 'src/app/services/api.service';
 import Swal from 'sweetalert2';
 
@@ -13,6 +14,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./mtm-almacen.component.css']
 })
 export class MtmAlmacenComponent implements OnInit,OnDestroy {
+  user!: UsuarioModel;
 
   almacenes:Almacen[] =[];
   almacen:Almacen= new Almacen();
@@ -47,8 +49,8 @@ export class MtmAlmacenComponent implements OnInit,OnDestroy {
   obtener(){
     this.isLoading();
     combineLatest([
-      this.api.obtenerAlmacenesMTM(),
-      this.api.obtenerEmpresas()
+      this.api.obtenerAlmacenesMTM(this.user.su),
+      this.api.obtenerEmpresas(this.user.su)
     ]).subscribe(([res1,res2])=>{
       if(res1.success){
         this.almacenes = res1.response!;
@@ -60,9 +62,15 @@ export class MtmAlmacenComponent implements OnInit,OnDestroy {
       this.stopLoading();
     })
   }
-
+  obtenerUsuario() {
+    var objectUser = localStorage.getItem('user-inventario-application');
+    if (objectUser != null) {
+      this.user = JSON.parse(objectUser);
+    }
+  }
 
   ngOnInit(): void {
+    this.obtenerUsuario();
     this.reiniciar();
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -198,9 +206,13 @@ export class MtmAlmacenComponent implements OnInit,OnDestroy {
               window.location.reload();
             });
           } else {
+            var message:string;
+            var flag:number;
+            message = r.message!;
+            flag = message.search('REFERENCE constraint');
             Swal.fire({
               title: 'Error',
-              text: r.message,
+              text: flag==0?r.message:'No se puede eliminar el item porque está siendo usado en otros registros.',
               icon: 'error'
             });
           }
@@ -216,6 +228,9 @@ export class MtmAlmacenComponent implements OnInit,OnDestroy {
             });
             return;
           }
+
+          
+
           Swal.fire({
             allowOutsideClick: false,
             icon: 'error',

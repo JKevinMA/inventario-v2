@@ -1,7 +1,9 @@
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { Empresa } from 'src/app/models/empresa.model';
+import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ApiService } from 'src/app/services/api.service';
 import Swal from 'sweetalert2';
 
@@ -11,7 +13,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./mtm-empresa.component.css']
 })
 export class MtmEmpresaComponent implements OnInit,OnDestroy {
-
+  user!: UsuarioModel;
   empresas:Empresa[] =[];
   empresa:Empresa= new Empresa();
   deleteId:number=0;
@@ -42,15 +44,21 @@ export class MtmEmpresaComponent implements OnInit,OnDestroy {
 
   obtener(){
     this.isLoading();
-    this.api.obtenerEmpresas().subscribe(r=>{
+    this.api.obtenerEmpresas(this.user.su).subscribe(r=>{
       this.empresas = r.response!;
       this.dtTrigger.next();
       this.stopLoading();
     });
   }
-
+  obtenerUsuario() {
+    var objectUser = localStorage.getItem('user-inventario-application');
+    if (objectUser != null) {
+      this.user = JSON.parse(objectUser);
+    }
+  }
 
   ngOnInit(): void {
+    this.obtenerUsuario();
     this.dtOptions = {
       pagingType: 'full_numbers',
       responsive:true
@@ -94,7 +102,10 @@ export class MtmEmpresaComponent implements OnInit,OnDestroy {
         });
 
         Swal.showLoading();
+
+        this.empresa.su = this.user.su;
         
+        console.log(this.empresa);
         var solicitud = this.creando?this.api.crearEmpresa(this.empresa):this.api.actualizarEmpresa(this.empresa);
 
         solicitud.subscribe(r => {
@@ -177,9 +188,13 @@ export class MtmEmpresaComponent implements OnInit,OnDestroy {
               window.location.reload();
             });
           } else {
+            var message:string;
+            var flag:number;
+            message = r.message!;
+            flag = message.search('REFERENCE constraint');
             Swal.fire({
               title: 'Error',
-              text: r.message,
+              text: flag==0?r.message:'No se puede eliminar el item porque está siendo usado en otros registros.',
               icon: 'error'
             });
           }

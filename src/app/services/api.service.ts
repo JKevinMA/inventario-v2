@@ -126,8 +126,8 @@ export class ApiService {
 
   //  MANTENIMIENTO
   // Empresa
-  obtenerEmpresas(){
-    return this.http.get<Result<Empresa[]>>(`${this.BASE_URL}empresas`);
+  obtenerEmpresas(su:number){
+    return this.http.get<Result<Empresa[]>>(`${this.BASE_URL}empresas?su=${su}`);
   }
   crearEmpresa(o:Empresa ){
     return this.http.post<Result<number>>(`${this.BASE_URL}empresas`,o);
@@ -140,8 +140,8 @@ export class ApiService {
   }
 
   // Articulo
-  obtenerArticulos(){
-    return this.http.get<Result<Articulo[]>>(`${this.BASE_URL}articulos/mtm`);
+  obtenerArticulos(su:number){
+    return this.http.get<Result<Articulo[]>>(`${this.BASE_URL}articulos/mtm?su=${su}`);
   }
   crearArticulo(o:Articulo ){
     return this.http.post<Result<number>>(`${this.BASE_URL}articulos`,o);
@@ -160,8 +160,8 @@ export class ApiService {
   }
 
   // Categoria
-  obtenerCategorias(){
-    return this.http.get<Result<Categoria[]>>(`${this.BASE_URL}categorias`);
+  obtenerCategorias(su:number){
+    return this.http.get<Result<Categoria[]>>(`${this.BASE_URL}categorias?su=${su}`);
   }
   obtenerCategoriasEmpresa(empresaId:number){
     return this.http.get<Result<Categoria[]>>(`${this.BASE_URL}categorias/empresa?empresaid=${empresaId}`);
@@ -177,8 +177,8 @@ export class ApiService {
   }
 
   // Familia
-  obtenerFamilias(){
-    return this.http.get<Result<Familia[]>>(`${this.BASE_URL}familias`);
+  obtenerFamilias(su:number){
+    return this.http.get<Result<Familia[]>>(`${this.BASE_URL}familias?su=${su}`);
   }
   obtenerFamiliasEmpresa(empresaId:number){
     return this.http.get<Result<Familia[]>>(`${this.BASE_URL}familias/empresa?empresaid=${empresaId}`);
@@ -208,8 +208,8 @@ export class ApiService {
   }
 
   // Almacen
-  obtenerAlmacenesMTM(){
-    return this.http.get<Result<Almacen[]>>(`${this.BASE_URL}almacenes`);
+  obtenerAlmacenesMTM(su:number){
+    return this.http.get<Result<Almacen[]>>(`${this.BASE_URL}almacenes?su=${su}`);
   }
   crearAlmacen(o:Almacen){
     return this.http.post<Result<number>>(`${this.BASE_URL}almacenes`,o);
@@ -222,8 +222,8 @@ export class ApiService {
   }
 
   // Area
-  obtenerAreasMTM(){
-    return this.http.get<Result<Area[]>>(`${this.BASE_URL}areas`);
+  obtenerAreasMTM(su:number){
+    return this.http.get<Result<Area[]>>(`${this.BASE_URL}areas?su=${su}`);
   }
   crearArea(o:Area){
     return this.http.post<Result<number>>(`${this.BASE_URL}areas`,o);
@@ -236,8 +236,8 @@ export class ApiService {
   }
 
   // Local
-  obtenerLocalesMTM(){
-    return this.http.get<Result<Local[]>>(`${this.BASE_URL}locales`);
+  obtenerLocalesMTM(su:number){
+    return this.http.get<Result<Local[]>>(`${this.BASE_URL}locales?su=${su}`);
   }
   crearLocal(o:Local){
     return this.http.post<Result<number>>(`${this.BASE_URL}locales`,o);
@@ -264,8 +264,8 @@ export class ApiService {
   }
 
   // Usuario
-  obtenerUsuarioMTM(){
-    return this.http.get<Result<UsuarioModel[]>>(`${this.BASE_URL}usuarios`);
+  obtenerUsuarioMTM(su:number){
+    return this.http.get<Result<UsuarioModel[]>>(`${this.BASE_URL}usuarios?su=${su}`);
   }
   obtenerUsuariosEmpresa(empresaId:number){
     return this.http.get<Result<UsuarioModel[]>>(`${this.BASE_URL}usuarios/empresa?empresaid=${empresaId}`);
@@ -281,8 +281,8 @@ export class ApiService {
   }
 
   // UsuarioArea
-  obtenerUsuariosAreaMTM(){
-    return this.http.get<Result<UsuarioArea[]>>(`${this.BASE_URL}usuariosarea`);
+  obtenerUsuariosAreaMTM(su:number){
+    return this.http.get<Result<UsuarioArea[]>>(`${this.BASE_URL}usuariosarea?su=${su}`);
   }
   crearUsuarioArea(o:UsuarioArea){
     return this.http.post<Result<number>>(`${this.BASE_URL}usuariosarea`,o);
@@ -292,8 +292,8 @@ export class ApiService {
   }
 
   // ArticuloTipoInventario
-  obtenerArticulosTipoInventarioMTM(){
-    return this.http.get<Result<ArticuloTipoInventario[]>>(`${this.BASE_URL}articulostipoinventario`);
+  obtenerArticulosTipoInventarioMTM(su:number){
+    return this.http.get<Result<ArticuloTipoInventario[]>>(`${this.BASE_URL}articulostipoinventario?su=${su}`);
   }
   crearArticuloTipoInventario(o:ArticuloTipoInventario){
     return this.http.post<Result<number>>(`${this.BASE_URL}articulostipoinventario`,o);

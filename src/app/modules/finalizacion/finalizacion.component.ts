@@ -5,6 +5,7 @@ import { TomaInventarioCabecera, TomaInventarioDetalle } from 'src/app/models/to
 import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ApiService } from 'src/app/services/api.service';
 import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-finalizacion',
@@ -66,6 +67,7 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
       this.api.obtenerInventariosAbiertos(this.user.usuarioId,'APERTURADO'),
       this.api.obtenerInventariosAbiertos(this.user.usuarioId,'FINALIZADO')
     ]).subscribe(([res,res2])=>{
+      console.log(res);
       if (res.success) {
         this.inventariosAbiertos = res.response!;
       }
@@ -324,5 +326,31 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
       });
     });
   }
-
+  exportar(tid:TomaInventarioDetalle[]){
+    var json: any[] = [];
+    tid.forEach(d=>{
+      json.push(
+        {
+          "Toma de Inventario ID":d.tomaInventarioId,
+          "Código Artículo":d.codigo,
+          "Nombre Artículo":d.articulo,
+          "En blanco?":d.blanco?'Sí':'No',
+          "Unidad de Medida":d.unidadMedida,
+          "Cantidad Tomada":d.cantidad,
+        }
+      )
+    })
+    let hoy:Date = new Date();
+    var anio = hoy.getFullYear().toString();
+    var mes = (hoy.getMonth()+1).toString();
+    var dia = hoy.getDate().toString();
+    var hora = hoy.getHours().toString();
+    var min = hoy.getMinutes().toString();
+    var sec = hoy.getSeconds().toString();
+    var fileName= `DetalleToma${anio}${mes}${dia}${hora}${min}${sec}.xlsx`;
+    const ws: XLSX.WorkSheet =XLSX.utils.json_to_sheet(json);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, fileName);
+  }
 }

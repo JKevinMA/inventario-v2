@@ -6,6 +6,7 @@ import { Categoria } from 'src/app/models/categoria.model';
 import { Empresa } from 'src/app/models/empresa.model';
 import { Familia } from 'src/app/models/familia.model';
 import { UnidadMedida } from 'src/app/models/unidad-medida.model';
+import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ApiService } from 'src/app/services/api.service';
 import Swal from 'sweetalert2';
 
@@ -15,6 +16,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./mtm-articulo.component.css']
 })
 export class MtmArticuloComponent implements OnInit,OnDestroy {
+  user!: UsuarioModel;
+
   articulos: Articulo[] = [];
   articulo: Articulo = new Articulo();
   deleteId: number = 0;
@@ -32,7 +35,7 @@ export class MtmArticuloComponent implements OnInit,OnDestroy {
   unidadesMedida:UnidadMedida[]=[];
 
   constructor(private api: ApiService) {
-    this.obtener();
+    
   }
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
@@ -49,12 +52,19 @@ export class MtmArticuloComponent implements OnInit,OnDestroy {
     Swal.close();
   }
 
+  obtenerUsuario() {
+    var objectUser = localStorage.getItem('user-inventario-application');
+    if (objectUser != null) {
+      this.user = JSON.parse(objectUser);
+    }
+  }
+
   obtener() {
 
     this.isLoading();
     combineLatest([
-      this.api.obtenerArticulos(),
-      this.api.obtenerEmpresas(),
+      this.api.obtenerArticulos(this.user.su),
+      this.api.obtenerEmpresas(this.user.su),
       this.api.obtenerUnidadesMedida(),
     ]).subscribe(([res1,res2,res3])=>{
       if(res1.success){
@@ -74,7 +84,7 @@ export class MtmArticuloComponent implements OnInit,OnDestroy {
 
   cargarControles(){
     this.isLoading();
-    this.api.obtenerEmpresas().subscribe(r=>{
+    this.api.obtenerEmpresas(this.user.su).subscribe(r=>{
       if(r.success){
         this.empresas = r.response!;
       }
@@ -83,11 +93,13 @@ export class MtmArticuloComponent implements OnInit,OnDestroy {
   }
 
   ngOnInit(): void {
+    this.obtenerUsuario();
     this.reiniciar();
     this.dtOptions = {
       pagingType: 'full_numbers',
       responsive:true
     };
+    this.obtener();
   }
 
   reiniciar(){
@@ -250,9 +262,13 @@ export class MtmArticuloComponent implements OnInit,OnDestroy {
               window.location.reload();
             });
           } else {
+            var message:string;
+            var flag:number;
+            message = r.message!;
+            flag = message.search('REFERENCE constraint');
             Swal.fire({
               title: 'Error',
-              text: r.message,
+              text: flag==0?r.message:'No se puede eliminar el item porque está siendo usado en otros registros.',
               icon: 'error'
             });
           }

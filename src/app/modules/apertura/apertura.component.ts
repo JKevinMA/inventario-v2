@@ -124,7 +124,15 @@ export class AperturaComponent implements OnInit,OnDestroy {
     this.dtTrigger.next();
   }
 
+  reiniciarStock(){
+    
+  }
+
   DataFromEventEmmiter(o: any) {
+    /* this.area.articulos.map((val,ind)=>{
+      val.stockTeorico = 0;
+      val.precioPromedio = 0;
+    }); */
     console.log('DataFromEventEmmiter', o);
     this.articulosAlerta = [];
     for (let i = 0; i < o.length; i++) {
@@ -143,6 +151,8 @@ export class AperturaComponent implements OnInit,OnDestroy {
         this.articulosAlerta.push(o[i]);
       }
     }
+    console.log("cargados");
+    console.log(this.area.articulos);
   }
   cerrarModal() {
     try {
@@ -179,7 +189,9 @@ export class AperturaComponent implements OnInit,OnDestroy {
   seleccionarAlmacen(almacen: Almacen) {
     console.log(almacen);
     almacen.areas.forEach(are => {
-      are.selected = !almacen.selected;
+      if(are.articulos.length!=0){
+        are.selected = !almacen.selected;
+      }
     });
   }
 
@@ -356,3 +368,4 @@ export class AperturaComponent implements OnInit,OnDestroy {
   }
 
 }
+

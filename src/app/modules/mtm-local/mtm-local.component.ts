@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { combineLatest, Subject } from 'rxjs';
 import { Empresa } from 'src/app/models/empresa.model';
 import { Local } from 'src/app/models/local.model';
+import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ApiService } from 'src/app/services/api.service';
 import Swal from 'sweetalert2';
 
@@ -12,6 +13,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./mtm-local.component.css']
 })
 export class MtmLocalComponent implements OnInit,OnDestroy {
+  user!: UsuarioModel;
 
   locales:Local[] =[];
   local:Local= new Local();
@@ -37,7 +39,12 @@ export class MtmLocalComponent implements OnInit,OnDestroy {
   stopLoading(){
     Swal.close();
   }
-
+  obtenerUsuario() {
+    var objectUser = localStorage.getItem('user-inventario-application');
+    if (objectUser != null) {
+      this.user = JSON.parse(objectUser);
+    }
+  }
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
   }
@@ -45,8 +52,8 @@ export class MtmLocalComponent implements OnInit,OnDestroy {
   obtener(){
     this.isLoading();
     combineLatest([
-      this.api.obtenerLocalesMTM(),
-      this.api.obtenerEmpresas()
+      this.api.obtenerLocalesMTM(this.user.su),
+      this.api.obtenerEmpresas(this.user.su)
     ]).subscribe(([res1,res2])=>{
       if(res1.success){
         this.locales = res1.response!;
@@ -62,6 +69,7 @@ export class MtmLocalComponent implements OnInit,OnDestroy {
 
 
   ngOnInit(): void {
+    this.obtenerUsuario();
     this.reiniciar();
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -191,9 +199,13 @@ export class MtmLocalComponent implements OnInit,OnDestroy {
               window.location.reload();
             });
           } else {
+            var message:string;
+            var flag:number;
+            message = r.message!;
+            flag = message.search('REFERENCE constraint');
             Swal.fire({
               title: 'Error',
-              text: r.message,
+              text: flag==0?r.message:'No se puede eliminar el item porque está siendo usado en otros registros.',
               icon: 'error'
             });
           }
