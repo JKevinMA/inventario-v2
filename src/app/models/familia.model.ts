@@ -3,4 +3,5 @@ export class Familia{
     descripcion!:string;
     empresaId!:number;
     empresa!:string;
+    codigo!:string;
 }

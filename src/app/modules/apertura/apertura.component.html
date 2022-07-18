@@ -35,18 +35,6 @@
                                 <span *ngIf="Local.value==0 && Local.touched " class="error-custom">Seleccione un local
                                     válido</span>
                             </div>
-                            <!-- <div class="form-group">
-                                <label for="selectAlmacenes">Almacen</label>
-                                <select #Almacen="ngModel" [(ngModel)]="almacenId" [disabled]="localId==0 || paso_2"
-                                    name="Almacen" id="selectAlmacenes" class="custom-select" required>
-                                    <option value="0">Selecciona un Almacen</option>
-                                    <option [value]="almacen.almacenId" *ngFor="let almacen of almacenes">
-                                        {{almacen.descripcion}}
-                                    </option>
-                                </select>
-                                <span *ngIf="Almacen.value==0 && Almacen.touched " class="error-custom">Seleccione un
-                                    almacen válido</span>
-                            </div> -->
                             <div class="form-group">
                                 <label for="selectTiposInventario">Tipo de Inventario</label>
                                 <select [disabled]="paso_2" #TipoInventario="ngModel" [(ngModel)]="tipoInventarioId"
@@ -59,6 +47,34 @@
                                 <span *ngIf="TipoInventario.value==0 && TipoInventario.touched "
                                     class="error-custom">Seleccione un tipo de inventario válido</span>
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="fechaInventario">Fecha de Inventario</label>
+                                <div class="input-group date"  id="datetimepicker1" data-target-input="nearest">
+                                    <input readonly [(ngModel)]="modelFechaInicio"  [minDate]="{year: limiteFecha!.year, month: limiteFecha!.month, day: limiteFecha!.day}" class="form-control" placeholder="yyyy-mm-dd" name="dp"
+                                        ngbDatepicker #d="ngbDatepicker" id="fechaInventario">
+                                    <div class="input-group-append calendar" (click)="d.toggle()">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fechaVisualizacion">Fecha de Visualización</label>
+                                <div class="input-group date"  id="datetimepicker2" data-target-input="nearest">
+                                    <input readonly [(ngModel)]="modelFechaVisualizacion"  [minDate]="{year: limiteFecha!.year, month: limiteFecha!.month, day: limiteFecha!.day}" class="form-control" placeholder="yyyy-mm-dd" name="dp2"
+                                        ngbDatepicker #d2="ngbDatepicker" id="fechaVisualizacion">
+                                    <div class="input-group-append calendar" (click)="d2.toggle()">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="horaVisualizacion">Hora de Visualización</label>
+                                <ngb-timepicker readonly name="timePicker" [(ngModel)]="time" [meridian]="meridian"></ngb-timepicker>
+                            </div>
+
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn" [class.btn-primary]="paso_1" [disabled]="paso_2"
@@ -74,25 +90,25 @@
                     </div>
                     <form autocomplete="off" id="formularioPaso2" (ngSubmit)="submitCriterios(formularioPaso2)"
                         #formularioPaso2="ngForm">
-                        <div class="card-body p-0">
+                        <div class="card-body p-0 table-responsive">
                             <table class="table row-border">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th style="width: 100px;">Seleccionar</th>
+                                        <th style="width: 100px; ">Seleccionar</th>
                                         <th>Almacen</th>
                                     </tr>
                                 </thead>
                                 <tbody *ngFor="let almacen of almacenes;let i = index">
                                     <tr>
-                                        <td class="text-center"> <input class="form-check-input"
-                                                [(ngModel)]="almacen.selected" (click)="seleccionarAlmacen(almacen)" name="cbg_almacen" type="checkbox"></td>
+                                        <td class="text-center "> <input class="form-check-input"
+                                                [(ngModel)]="almacen.selected"  [disabled]="almacen.areas?.length==0" (click)="seleccionarAlmacen(almacen)" name="cbg_almacen" type="checkbox"></td>
                                         <td>
                                             {{almacen.descripcion}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td></td>
-                                        <td class="p-0">
+                                        <td class="p-0 table-responsive">
                                             <table class="table row-border">
                                                 <thead class="thead-light">
                                                     <tr>
@@ -104,6 +120,9 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    <tr *ngIf="almacen.areas?.length==0">
+                                                        <td class="text-center" colspan="5">Sin áreas</td>
+                                                    </tr>
                                                     <tr *ngFor="let ar of almacen.areas;let i = index;">
                                                         <td disabled="ar.articulos.length==0" class="text-center"> <input class="form-check-input"
                                                                 [(ngModel)]="ar.selected" [disabled]="ar.articulos?.length==0" name="cbg_area_{{ar.areaId}}" type="checkbox"></td>
@@ -117,13 +136,11 @@
                                                         <td>
                                                             {{ar.descripcion}}
                                                         </td>
-                                                        <td>{{ar.articulos?.length}}</td>
+                                                        <td>{{ar.articulos? ar.articulos.length : 0}}</td>
                                                         <td>
                                                             {{ar.archivo}}
                                                         </td>
-
                                                     </tr>
-
                                                 </tbody>
                                             </table>
                                         </td>
@@ -136,7 +153,7 @@
                                 (click)="atras()" [class.btn-secondary]="paso_1">Atras</button>
 
                             <button (click)="aperturar()" type="button"
-                            [disabled]="paso_1"
+                            [disabled]="paso_1 "
                                 class="btn btn-success">
                                 Aperturar areas seleccionadas</button>
 
@@ -176,8 +193,10 @@
                             </ul>
                         </div>
                     </div>
+
+                    <app-custom-table [items]="area.articulos" [cabeceras]="cabeceras"></app-custom-table>
                     
-                    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+                    <!-- <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
                         <thead class="thead-light">
                             <tr>
                                 <th>Codigo</th>
@@ -201,7 +220,7 @@
                                 <td class="text-right">{{articulo.precioPromedio | currency:'S/. '}}</td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table> -->
 
                     <!-- <app-datatable-articulos-apertura [articulos]="area.articulos" ></app-datatable-articulos-apertura> -->
                 </div>

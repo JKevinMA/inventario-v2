@@ -17,6 +17,17 @@ export class LoginComponent implements OnInit {
   constructor(private api:ApiService,private router:Router) { }
 
   ngOnInit(): void {
+    if(this.api.estaAutenticado()){
+      this.router.navigateByUrl("inicio");
+      var r = this.api.obtenerUsuarioLogeado();
+       if (r.administrador) {
+          this.router.navigate(['/mantenimiento/empresa']);
+        }else if(r.supervisor){
+          this.router.navigate(['/inventario/apertura']);
+        }else{
+          this.router.navigate(['/inventario/toma']);
+        }
+    }
   }
 
   login(formulario:NgForm){
@@ -43,7 +54,9 @@ export class LoginComponent implements OnInit {
           });
         }else{
           Swal.close();
-          this.router.navigate(['/']);
+          window.location.reload();
+         
+
         }
       }else if(!r.success){
         Swal.fire({
@@ -56,6 +69,7 @@ export class LoginComponent implements OnInit {
     },(err=>{
       console.log(err);
       if(err.name=="HttpErrorResponse"){
+        console.log(err.message);
         Swal.fire({
           allowOutsideClick:false,
           icon: 'error',

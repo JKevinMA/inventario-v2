@@ -1,12 +1,14 @@
 export class InventarioCabecera{
     inventarioId!:number;
-    fechaInicio!:Date;
+    fechaCreacion!:Date;
     fechaFin!:Date;
     estado!:string;
-    archivoStock!:string;
+    archivoStock!:string | null;
     usuarioId!:number;
     tipoInventarioId!:number;
     areaId!:number;
+    fechaInicio!:Date;
+    fechaVisualizacion!:Date;
 
     detalles!:InventarioDetalle[];
 
@@ -16,6 +18,10 @@ export class InventarioCabecera{
     area!:string;
     iniciado!:boolean;
     cerrado!:boolean;
+
+    getFechaInicio(){
+        return new Date(this.fechaInicio);
+    }
 }
 
 export class InventarioDetalle{
@@ -38,3 +44,5 @@ export class InventarioDetalle{
     absValDif!:number;
     faltante!:number;
 }
+
+

@@ -1,0 +1,112 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Reporte Ingresos y Salidas Consolidadas</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a [routerLink]="['/ingresos-salidas']">Ingresos / Salidas</a></li>
+                    <li class="breadcrumb-item active">Reporte Ingresos y Salidas Consolidadas</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content ">
+    <div class="container-fluid">
+        <div class="row p-3">
+            <div class="col-md-12" >
+                <div class="" style="display: flex; align-items:center;flex-wrap: wrap; gap: 20px;">
+                    <div class="filter-group ">
+                        <label for="fecha">Fecha:</label>
+                        <div class="input-group date ml-2  date-input"  id="datetimepicker4" data-target-input="nearest">
+                            <input [(ngModel)]="model" class="form-control " placeholder="yyyy-mm-dd" name="dp"
+                                ngbDatepicker #d="ngbDatepicker" id="fecha">
+                            <div class="input-group-append calendar" (click)="d.toggle()">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" filter-group">
+                        <label for="local">Local:</label>
+                        <select #Local="ngModel" (change)="seleccionaLocal()" name="" [(ngModel)]="localId" class="form-control ml-2" id="local">
+                            <option value="0">Seleccione un local</option>
+                            <option *ngFor="let local of locales" [value]="local.localId">{{local.descripcion}}</option>
+                        </select>
+                    </div>
+                    <div class="  filter-group">
+                        <label for="almacen">Almacén:</label>
+                        <select #Almacen="ngModel" (change)="seleccionaAlmacen()" name="" [(ngModel)]="almacenId" class="form-control ml-2" id="almacen">
+                            <option value="0">Seleccione un almacén</option>
+                            <option *ngFor="let almacen of almacenes" [value]="almacen.almacenId">
+                                {{almacen.descripcion}}</option>
+                        </select>
+                    </div>
+                    <div class=" filter-group">
+                        <label for="area">Área:</label>
+                        <select #Area="ngModel" name="" [(ngModel)]="areaId" class="form-control ml-2 " id="area">
+                            <option value="0">Seleccione un área</option>
+                            <option *ngFor="let area of areas" [value]="area.areaId">{{area.descripcion}}</option>
+                        </select>
+                    </div>
+                    
+                    <button (click)="consolidar()" class="btn btn-primary ">
+                        <i class="fas fa-window-restore"></i>
+                        Consolidar</button>
+                </div>
+                
+            </div>
+            <div style="margin-top:16px;display: flex; flex-direction:column;">
+                <span *ngIf=" (localId == 0) && Local.touched " class="error-custom"> * Seleccione el local</span>
+                <span *ngIf=" (almacenId == 0) && Almacen.touched " class="error-custom"> * Seleccione el almacén</span>
+                <span *ngIf=" (areaId == 0) && Area.touched " class="error-custom"> * Seleccione el área</span>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Ingreso y Salida Consolidada </h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        
+                        <!-- <table  datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table row-border hover "> -->
+                        <table  class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Codigo</th> 
+                                    <th>Articulo</th> 
+                                    <th>Unidad de Medida</th> 
+                                    <th>Stock Inicial</th> 
+                                    <th>Ingreso</th> 
+                                    <th>Salida</th> 
+                                    <th>Stock Final</th> 
+                                    <th>Inventario</th> 
+                                    <th>Diferencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let isc of ingresoSalidaConsolidada">
+                                    <td>{{isc.codigo}}</td>
+                                    <td>{{isc.articulo}}</td>
+                                    <td>{{isc.unidadMedida}}</td>
+                                    <td class="text-right">{{isc.stockInicial | number:'0.2-2'}}</td>
+                                    <td class="text-right">{{isc.ingreso | number:'0.2-2'}}</td>
+                                    <td class="text-right">{{isc.salida | number:'0.2-2'}}</td>
+                                    <td class="text-right">{{(isc.stockInicial +isc.ingreso - isc.salida) | number:'0.2-2'}}</td>
+                                    <td class="text-right">{{isc.inventario | number:'0.2-2'}}</td>
+                                    <td class="text-right"> <p class="chip" [class.positive]="(isc.stockInicial + isc.ingreso - isc.salida - isc.inventario) >= 0" [class.negative]="(isc.stockInicial + isc.ingreso - isc.salida - isc.inventario)<0">{{(isc.stockInicial + isc.ingreso - isc.salida - isc.inventario) | number:'0.2-2'}}</p> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!--  <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="Disabled tooltip">
+                            <button class="btn btn-success">Hola mundo</button>
+                        </span> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

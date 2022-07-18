@@ -1,0 +1,145 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Registrar Salida de Articulos</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a [routerLink]="['/ingresos-salidas']">Ingresos / Salidas</a></li>
+                    <li class="breadcrumb-item active">Registrar Salida de Articulos</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content ">
+    <div class="container-fluid">
+        <div class="row p-3">
+            <div class="col-md-12" >
+                <div class="" style="display: flex; align-items:center;flex-wrap: wrap; gap: 20px;">
+                    <div class="filter-group">
+                        <label for="fecha">Fecha:</label>
+                        <div class="input-group date ml-2" style="width:150px" id="datetimepicker4" data-target-input="nearest">
+                            <input [(ngModel)]="model" class="form-control" placeholder="yyyy-mm-dd" name="dp"
+                                ngbDatepicker #d="ngbDatepicker" id="fecha">
+                            <div class="input-group-append calendar" (click)="d.toggle()">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" filter-group">
+                        <label for="local">Local:</label>
+                        <select #Local="ngModel" (change)="seleccionaLocal()" name="" [(ngModel)]="localId" class="form-control ml-2" id="local">
+                            <option value="0">Seleccione un local</option>
+                            <option *ngFor="let local of locales" [value]="local.localId">{{local.descripcion}}</option>
+                        </select>
+                    </div>
+                    <div class="  filter-group">
+                        <label for="almacen">Almacén:</label>
+                        <select #Almacen="ngModel" (change)="seleccionaAlmacen()" name="" [(ngModel)]="almacenId" class="form-control ml-2" id="almacen">
+                            <option value="0">Seleccione un almacén</option>
+                            <option *ngFor="let almacen of almacenes" [value]="almacen.almacenId">
+                                {{almacen.descripcion}}</option>
+                        </select>
+                    </div>
+                    <div class=" filter-group">
+                        <label for="area">Área:</label>
+                        <select #Area="ngModel" name="" [(ngModel)]="areaId" class="form-control ml-2 " id="area">
+                            <option value="0">Seleccione un área</option>
+                            <option *ngFor="let area of areas" [value]="area.areaId">{{area.descripcion}}</option>
+                        </select>
+                    </div>
+                    
+                    <button (click)="buscar()" class="btn btn-primary ">
+                        <i class="fas fa-search"></i>
+                        Buscar</button>
+                </div>
+                
+            </div>
+            <div style="margin-top:16px;display: flex; flex-direction:column;">
+                <span *ngIf=" (localId == 0) && Local.touched " class="error-custom"> * Seleccione el local</span>
+                <span *ngIf=" (almacenId == 0) && Almacen.touched " class="error-custom"> * Seleccione el almacén</span>
+                <span *ngIf=" (areaId == 0) && Area.touched " class="error-custom"> * Seleccione el área</span>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Ingreso de articulos </h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Codigo</th> 
+                                    <th>Articulo</th> 
+                                    <th>Unidad de Medida</th> 
+                                    <th>Cantidad</th> 
+                                    <!-- <th>Precio Unitario (S/.)</th> 
+                                    <th>Precio Total (S/.)</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let md of movimientoDetalles">
+                                    <td>{{md.codigo}}</td>
+                                    <td>{{md.articulo}}</td>
+                                    <td>{{md.unidadMedida}}</td>
+                                    <td><input [(ngModel)]="md.cantidad" type="number" class="form-control form-control-sm text-right"></td>
+                                    <!-- <td><input [(ngModel)]="md.precioUnitario" type="number" class="form-control form-control-sm text-right"></td>
+                                    <td class="text-right">{{(md.cantidad! * md.precioUnitario!) | number:'2.2-2'}}</td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3" style="display: flex; justify-content:end;">
+            <button [disabled]="movimientoDetalles!.length==0" (click)="guardar()" class="btn btn-success"> 
+                <i class="fas fa-check-circle"></i>
+                &nbsp;&nbsp;Registrar Salida</button>
+        </div>
+        <!-- <div class="row" *ngIf="indexSeleccionado!=-1">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Detalles de toma de inventario seleccionada</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Articulo</th>
+                                    <th>Unidad de Medida</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center" *ngIf="tomasConsolidadaDetalle.length==0">
+                                    <td colspan="4">No existen tomas de inventarios con los parámetros consultados</td>
+                                </tr>
+
+                                <tr *ngFor="let tcd of tomasConsolidadaDetalle; let i = index">
+                                    <td>{{tcd.codigo}}</td>
+                                    <td>{{tcd.articulo}}</td>
+                                    <td>{{tcd.unidadMedida}}</td>
+                                    <td style="text-align: end;">{{tcd.cantidad}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="m-3" style="display:flex;justify-content: end;">
+                            <button class="btn btn-success">Exportar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+</section>

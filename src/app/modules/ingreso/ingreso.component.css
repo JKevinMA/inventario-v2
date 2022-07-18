@@ -1,0 +1,16 @@
+.filter-group{
+    display: flex;
+    align-items: end;
+}
+.date-input{
+    width: 150px;
+}
+
+@media (max-width: 800px) {
+    .filter-group{
+        width: 100%;
+    }
+    .date-input{
+        width: 100%;
+    }
+}

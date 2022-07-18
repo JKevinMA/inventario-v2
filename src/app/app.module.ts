@@ -16,7 +16,7 @@ import { DatatableArticulosAperturaComponent } from './components/datatable-arti
     BrowserModule,
     AppRoutingModule,
     PagesModule,
-    NgbModule
+    NgbModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -13,7 +13,7 @@
         </div>
     </div>
 </section>
-<section class="content">
+<section class="content" id="seccion-articulo-tipoinventario">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -37,6 +37,7 @@
                                     <th>Tipo de Inventario</th>
                                     <th>Orden</th>
                                     <th>Localizacion</th>
+                                    <th>Estado</th>
                                     <th>Área</th>
                                     <th>Almacen</th>
                                     <th>Local</th>
@@ -51,6 +52,7 @@
                                     <td>{{atp.tipoInventario}}</td>
                                     <td>{{atp.orden}}</td>
                                     <td>{{atp.localizacion}}</td>
+                                    <td>{{atp.habilitado?'HABILITADO':'DESHABILITADO'}}</td>
                                     <td>{{atp.area}}</td>
                                     <td>{{atp.almacen}}</td>
                                     <td>{{atp.local}}</td>
@@ -120,12 +122,18 @@
                         </div>
                         <div class="form-group">
                             <label for="selectArticulo">Artículo</label>
-                            <select  [(ngModel)]="articuloTipoInventario.articuloId" name="Articulo" #Articulo="ngModel" class="form-control">
+                            <ng-select2  [width]="'100%'"  [placeholder]="'Selecciona un artículo...'" [(ngModel)]="articuloTipoInventario.articuloId" [data]="articulosData" name="Articulo"  #Articulo="ngModel"  aria-hidden="true">
+                                <!-- <option value="0" >Selecciona un Artículo</option>
+                                <option [ngValue]="articulo.articuloId"  *ngFor="let articulo of articulos">{{articulo.codigo}} | {{articulo.descripcion}}</option> -->
+                            </ng-select2>
+                            <span *ngIf=" (articuloTipoInventario.articuloId == 0) && Articulo.touched " class="error-custom">Seleccione el artículo</span>
+                            <!-- <select  [(ngModel)]="articuloTipoInventario.articuloId" name="Articulo" #Articulo="ngModel" class="form-control">
                                 <option value="0">Selecciona un Artículo</option>
                                 <option [value]="articulo.articuloId" *ngFor="let articulo of articulos">{{articulo.codigo}} | {{articulo.descripcion}}</option>
                             </select>
-                            <span *ngIf=" (articuloTipoInventario.articuloId == 0) && Articulo.touched " class="error-custom">Seleccione el artículo</span>
+                            <span *ngIf=" (articuloTipoInventario.articuloId == 0) && Articulo.touched " class="error-custom">Seleccione el artículo</span> -->
                         </div>
+                        
                         <div class="form-group">
                             <label for="selectTipoInventario">Tipo de Inventario</label>
                             <select  [(ngModel)]="articuloTipoInventario.tipoInventarioId" name="TipoInventario" #TipoInventario="ngModel" class="form-control">
@@ -147,6 +155,12 @@
                                 #Localizacion="ngModel" [(ngModel)]="articuloTipoInventario.localizacion" name="Localizacion" id="inputLocalizacion"
                                 class="form-control" placeholder="Ingrese localizacion" required>
                             <span *ngIf="Localizacion.invalid && Localizacion.touched " class="error-custom">Ingrese localizacion</span>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input [(ngModel)]="articuloTipoInventario.habilitado" type="checkbox" class="custom-control-input" name="Habilitar"  id="customSwitch1">
+                                <label class="custom-control-label" for="customSwitch1">Habilitar</label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">

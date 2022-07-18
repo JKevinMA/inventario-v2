@@ -20,6 +20,13 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataTablesModule } from 'angular-datatables';
 import { ReadexcelDirective } from '../directives/readexcel.directive';
 import { ComponentsModule } from '../components/components.module';
+import { PruebaComponent } from './prueba/prueba.component';
+import { TomaConsolidadaComponent } from './toma-consolidada/toma-consolidada.component';
+import { IngresoComponent } from './ingreso/ingreso.component';
+import { RouterModule } from '@angular/router';
+import { IngresoSalidaConsolidadaComponent } from './ingreso-salida-consolidada/ingreso-salida-consolidada.component';
+import { SalidaComponent } from './salida/salida.component';
+import { NgSelect2Module } from 'ng-select2';
 
 
 
@@ -40,7 +47,12 @@ import { ComponentsModule } from '../components/components.module';
     MtmArticuloComponent,
     MtmArticuloTipoInventarioComponent,
     MtmCategoriaComponent,
-    ReadexcelDirective
+    ReadexcelDirective,
+    PruebaComponent,
+    TomaConsolidadaComponent,
+    IngresoComponent,
+    IngresoSalidaConsolidadaComponent,
+    SalidaComponent
   ],
   imports: [
     CommonModule,
@@ -48,7 +60,9 @@ import { ComponentsModule } from '../components/components.module';
     ReactiveFormsModule,
     NgbModule,
     DataTablesModule,
-    ComponentsModule
+    ComponentsModule,
+    RouterModule,
+    NgSelect2Module
   ],
   exports:[
     AperturaComponent,
@@ -65,7 +79,12 @@ import { ComponentsModule } from '../components/components.module';
     MtmFamiliaComponent,
     MtmArticuloComponent,
     MtmArticuloTipoInventarioComponent,
-    ReadexcelDirective
+    ReadexcelDirective,
+    PruebaComponent,
+    TomaConsolidadaComponent,
+    IngresoComponent,
+    IngresoSalidaConsolidadaComponent,
+    SalidaComponent
   ]
 })
 export class ModulesModule { }

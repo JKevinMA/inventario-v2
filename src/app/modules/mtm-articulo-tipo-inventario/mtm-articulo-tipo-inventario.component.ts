@@ -1,5 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Select2OptionData } from 'ng-select2';
 import { combineLatest, Subject } from 'rxjs';
 import { Almacen } from 'src/app/models/almacen.model';
 import { Area } from 'src/app/models/area.model';
@@ -25,6 +27,7 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
   deleteId:number=0;
   editArea= new ArticuloTipoInventario();
   articulos:Articulo[]=[];
+  articulosData:Array<Select2OptionData>=[];
   tiposInventario:TipoInventario[]=[];
   empresas:Empresa[] =[];
   locales:Local[] = [];
@@ -36,13 +39,15 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
   creando=true;
   noValido=true;
 
-  constructor(private api:ApiService) {
+  constructor(private api:ApiService,private _renderer2: Renderer2, 
+    @Inject(DOCUMENT) private _document: Document) {
   }
 
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
   }
  ngOnInit(): void {
+  
   this.obtenerUsuario();
     this.reiniciar();
     this.dtOptions = {
@@ -50,6 +55,15 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
       responsive:true
     };
     this.obtener();
+
+    /* this.cargarCombo(); */
+  }
+  cargarCombo(){
+    let elemento = this._document.getElementById('seccion-articulo-tipoinventario');
+    let script = this._renderer2.createElement('script');
+    script.type = 'application/javascript';
+    script.src = 'assets/custom.js';
+    this._renderer2.appendChild(elemento, script);
   }
   obtenerUsuario() {
     var objectUser = localStorage.getItem('user-inventario-application');
@@ -135,6 +149,7 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
         this.articuloTipoInventario.areaId = +this.articuloTipoInventario.areaId; 
         this.articuloTipoInventario.tipoInventarioId = +this.articuloTipoInventario.tipoInventarioId; 
         this.articuloTipoInventario.articuloId = +this.articuloTipoInventario.articuloId; 
+        
         
         console.log(this.articuloTipoInventario);
         var solicitud = this.creando?this.api.crearArticuloTipoInventario(this.articuloTipoInventario):this.api.actualizarArticuloTipoInventario(this.articuloTipoInventario);
@@ -295,9 +310,14 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
     this.isLoading();
     this.api.obtenerArticulosEmpresa(this.articuloTipoInventario.empresaId).subscribe(r=>{
       if(r.success){
+        this.articulosData=[];
         this.articulos = r.response!;
+        this.articulos.forEach(a=>{
+          this.articulosData.push({id:a.articuloId.toString(),text:a.descripcion});
+        });
       }
       this.stopLoading();
+      
     });
   }
 
@@ -319,5 +339,47 @@ export class MtmArticuloTipoInventarioComponent implements OnInit,OnDestroy {
       }
       this.stopLoading();
     });
+  }
+
+  ///////////////////////
+
+  public items:Array<string> = ['Amsterdam', 'Antwerp', 'Athens', 'Barcelona',
+    'Berlin', 'Birmingham', 'Bradford', 'Bremen', 'Brussels', 'Bucharest',
+    'Budapest', 'Cologne', 'Copenhagen', 'Dortmund', 'Dresden', 'Dublin',
+    'Düsseldorf', 'Essen', 'Frankfurt', 'Genoa', 'Glasgow', 'Gothenburg',
+    'Hamburg', 'Hannover', 'Helsinki', 'Kraków', 'Leeds', 'Leipzig', 'Lisbon',
+    'London', 'Madrid', 'Manchester', 'Marseille', 'Milan', 'Munich', 'Málaga',
+    'Naples', 'Palermo', 'Paris', 'Poznań', 'Prague', 'Riga', 'Rome',
+    'Rotterdam', 'Seville', 'Sheffield', 'Sofia', 'Stockholm', 'Stuttgart',
+    'The Hague', 'Turin', 'Valencia', 'Vienna', 'Vilnius', 'Warsaw', 'Wrocław',
+    'Zagreb', 'Zaragoza', 'Łódź'];
+ 
+  private value:any = {};
+  private _disabledV:string = '0';
+  private disabled:boolean = false;
+ 
+  private get disabledV():string {
+    return this._disabledV;
+  }
+ 
+  private set disabledV(value:string) {
+    this._disabledV = value;
+    this.disabled = this._disabledV === '1';
+  }
+ 
+  public selected(value:any):void {
+    console.log('Selected value is: ', value);
+  }
+ 
+  public removed(value:any):void {
+    console.log('Removed value is: ', value);
+  }
+ 
+  public typed(value:any):void {
+    console.log('New search input: ', value);
+  }
+ 
+  public refreshValue(value:any):void {
+    this.value = value;
   }
 }

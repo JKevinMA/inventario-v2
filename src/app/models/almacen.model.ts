@@ -4,6 +4,7 @@ export class Almacen{
     almacenId!:number;
     descripcion!:string;
     localId!:number;
+    habilitado:boolean=false;
 
     areas!:Area[];
     selected!:boolean;

@@ -33,6 +33,7 @@
                             <thead class="thead-light">
                                 <tr>
                                     <!-- <th>ID</th> -->
+                                    <th>Codigo</th>
                                     <th>Nombre de categoría</th>
                                     <th>Empresa</th>
                                     <th>Acciones</th>
@@ -41,6 +42,7 @@
                             <tbody>
                                 <tr *ngFor="let categoria of categorias">
                                     <!-- <td>{{categoria.categoriaId}}</td> -->
+                                    <td>{{categoria.codigo}}</td>
                                     <td>{{categoria.descripcion}}</td>
                                     <td>{{categoria.empresa}}</td>
                                     <td class="text-center">
@@ -74,6 +76,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        <div class="form-group">
+                            <label for="inputCodigo">Codigo de Categoría</label>
+                            <input [class.is-invalid]="Codigo.invalid && Codigo.touched" type="text"
+                                #Codigo="ngModel" [(ngModel)]="categoria.codigo" name="Codigo" id="inputCodigo"
+                                class="form-control" placeholder="Ingrese codigo de categoria" required>
+                            <span *ngIf="Codigo.invalid && Codigo.touched " class="error-custom">Ingrese codigo de
+                                categoria</span>
+                        </div>
                         <div class="form-group">
                             <label for="inputDescripcion">Nombre de Categoría</label>
                             <input [class.is-invalid]="Categoria.invalid && Categoria.touched" type="text"

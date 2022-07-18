@@ -68,6 +68,7 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
       this.api.obtenerInventariosAbiertos(this.user.usuarioId,'FINALIZADO')
     ]).subscribe(([res,res2])=>{
       console.log(res);
+      console.log(res2);
       if (res.success) {
         this.inventariosAbiertos = res.response!;
       }
@@ -88,8 +89,6 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
 
   forzarYObtenerTomasUsuarios(ia: InventarioCabecera) {
     this.esResumen =false;
-    this.paso_1 = false;
-    this.paso_2 = true;
     Swal.fire({
       title: 'Confirmación',
       text: 'Forzar el cierre de toma a los usuarios inventariadores?',
@@ -119,9 +118,10 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
             this.paso_1 = false;
           }
           this.stopLoading();
-          if (this.inventarioSeleccionado.archivoStock != "-") {
+          this.obtenerDataValidacion(this.inventarioSeleccionado);
+          /* if (this.inventarioSeleccionado.archivoStock != "-") {
             this.obtenerDataValidacion(this.inventarioSeleccionado);
-          }
+          } */
         }, err => {
           if (err.name == "HttpErrorResponse") {
             Swal.fire({
@@ -140,7 +140,8 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
           });
         });
       } else if (result.isDenied) {
-
+        this.paso_1=true;
+        this.paso_2=false;
       }
     });
 
@@ -159,9 +160,9 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
             this.paso_1 = false;
           }
           this.stopLoading();
-          if (this.inventarioSeleccionado.archivoStock != "-") {
-            this.obtenerDataValidacion(this.inventarioSeleccionado);
-          }
+          this.obtenerDataValidacion(this.inventarioSeleccionado);
+          /* if (this.inventarioSeleccionado.archivoStock != "-") {
+          } */
         });
   }
 
@@ -183,12 +184,16 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
         this.inventarioDetalle = r.response!;
         this.valorTeorico=0;
         this.inventarioDetalle.forEach(invd => {
-          invd.cantidadValidado = invd.cantidad;
+          if(!this.esResumen){
+            invd.cantidadValidado = invd.cantidad;
+          }
           invd.diferencia = invd.stockTeorico - invd.cantidadValidado;
           invd.usuarioIdValidado = this.user.usuarioId;
           this.valorTeorico+=(invd.stockTeorico*invd.precioPromedio);
           this.valorFisico+=(invd.cantidad*invd.precioPromedio);
         });
+        this.items = [...this.inventarioDetalle];
+        this.paginado();
       } else {
         Swal.fire({
           title: 'Error',
@@ -222,8 +227,6 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
   }
 
   finalizar() {
-    console.log(this.inventarioDetalle);
-    
     Swal.fire({
       title: 'Confirmación',
       text: 'Seguro de finalizar el inventario seleccionado?',
@@ -245,12 +248,10 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
 
         Swal.showLoading();
 
-
         this.api.finalizarInventario(this.inventarioSeleccionado.inventarioId).subscribe(r => {
           if (r.success) {
-            if (this.inventarioSeleccionado.archivoStock != '-') {
+            
               this.validar();
-            } else {
               Swal.fire({
                 allowOutsideClick: false,
                 icon: 'success',
@@ -259,7 +260,6 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
               }).then((result) => {
                 window.location.reload();
               });
-            }
           } else {
             Swal.fire({
               title: 'Error',
@@ -290,7 +290,7 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
     });
   }
   validar() {
-    this.api.validarCantidades(this.inventarioDetalle).subscribe(id => {
+    this.api.validarCantidades(this.items).subscribe(id => {
       if (id.success) {
         Swal.fire({
           allowOutsideClick: false,
@@ -353,4 +353,137 @@ export class FinalizacionComponent implements OnInit,OnDestroy {
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     XLSX.writeFile(wb, fileName);
   }
+
+  deseleccionarInventario(){
+    this.paso_1=true;
+    this.paso_2=false;
+    this.inventarioSeleccionado= new InventarioCabecera();
+    this.inventarioSeleccionado.archivoStock = null;
+    this.tomasInventarioUsuario = [];
+    this.tomaInventarioDetalle = [];
+    this.inventarioDetalle = [];
+    this.items=[];
+    
+    this.numItemsPerPage = 5;
+    this.numPages = 1;
+    this.pages = [1];
+    this.currentPage=1;
+    this.textoBusqueda="";
+    this.numeroResultados = 0;
+  }
+
+  //DATATABLE CONSOLIDACION - VALIDACION
+  cabeceras=[{id:"codigo",ordenar:0,nombre:"Codigo"},{id:"articulo",ordenar:0,nombre:"Articulo"},{id:"stockTeorico",ordenar:0,nombre:"Stock Teorico"},{id:"cantidad",ordenar:0,nombre:"Stock Fisico"},{id:"faltante",ordenar:0,nombre:"Faltante"},{id:"absValDif",ordenar:0,nombre:"Diferencia Valor"},{id:"cantidadValidado",ordenar:0,nombre: this.esResumen?"Cantidad Validada":"Validar"},{id:"diferencia",ordenar:0,nombre:"Faltante Final"},{id:"unidadMedida",ordenar:0,nombre:"Unidad"}];
+
+  ingresaBusqueda(x:any){
+    this.textoBusqueda = x.target.value;
+    this.buscar(x.target.value);
+  }
+
+
+  buscar(busqueda:any){
+    if(busqueda!=""){
+      this.items = [...this.inventarioDetalle];
+      var cabs = this.cabeceras;
+      this.items = this.items.filter(function(item){
+
+        for (let i = 0; i < cabs.length; i++) {
+          if(String(item[cabs[i].id]).toLowerCase().includes(busqueda.toLowerCase())){
+            return true;
+          }
+        }
+        return false;
+      });
+    }else{
+      this.items = [...this.inventarioDetalle];
+    }
+    this.paginado();
+  }
+  
+
+  calcularPaginas(){
+    var div =  this.items.length / this.numItemsPerPage; 
+    var trunc = Math.trunc(div);
+    this.numPages = div>trunc?(trunc+1):trunc;
+    this.pages = [];
+    for (let i = 0; i < this.numPages; i++) {
+      this.pages.push(i+1);
+    }
+  }
+
+  cambiaItemsPorPagina(){
+    this.numItemsPerPage = + this.numItemsPerPage;
+    this.paginado();
+  }
+
+  paginado(){
+    this.calcularPaginas();
+    this.generarItemsPorPagina();
+    this.currentPage=1;
+  }
+
+  generarItemsPorPagina(){
+    this.itemsPaginado = [];
+    var posIni = 0;
+    var posFin = this.numItemsPerPage;
+    for (let i = 0; i < this.numPages; i++) {
+      this.itemsPaginado.push(this.items.slice(posIni,posFin));
+      posIni += this.numItemsPerPage;
+      posFin += this.numItemsPerPage;
+    }
+  }
+
+  ordenar(cab:any){
+    if(cab.ordenar != null){
+      if(cab.ordenar == 0) {
+        this.cabeceras.map((cab)=>cab.ordenar=0);
+        cab.ordenar=1; //ascendente
+        this.items.sort(function (a, b) {
+          if (a[cab.id] > b[cab.id]) {
+            return 1;
+          }
+          if (a[cab.id] < b[cab.id]) {
+            return -1;
+          }
+          return 0;
+        });
+        
+      this.generarItemsPorPagina();
+        return;
+      } 
+      if(cab.ordenar == 1) {//descendente
+        this.cabeceras.map((cab)=>cab.ordenar=0);
+        cab.ordenar=2;
+        this.items.sort(function (a, b) {
+          if (a[cab.id] < b[cab.id]) {
+            return 1;
+          }
+          if (a[cab.id] > b[cab.id]) {
+            return -1;
+          }
+          return 0;
+        });
+        
+      this.generarItemsPorPagina();
+        return;
+      }
+      if(cab.ordenar == 2) {
+        cab.ordenar=0 //ninguno
+        this.items =  [...this.inventarioDetalle];
+        
+      this.generarItemsPorPagina();
+        return;
+      }
+    }
+    
+  }
+
+  items:any[] =[];
+  itemsPaginado : any[] = [];
+  numItemsPerPage = 5;
+  numPages = 1;
+  pages = [1];
+  currentPage=1;
+  textoBusqueda="";
+  numeroResultados = 0;
 }

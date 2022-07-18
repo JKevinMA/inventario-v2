@@ -36,6 +36,7 @@
                                     <th>Nombre de almacen</th>
                                     <th>Local</th>
                                     <th>Empresa</th>
+                                    <th>Estado</th>    
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -45,6 +46,7 @@
                                     <td>{{almacen.descripcion}}</td>
                                     <td>{{almacen.local}}</td>
                                     <td>{{almacen.empresa}}</td>
+                                    <td>{{almacen.habilitado?'HABILITADO':'DESHABILITADO'}}</td>
                                     <td class="text-center">
                                         <div class="btn-group">
                                             <button (click)="editar(almacen)" type="button" class="btn btn-warning" data-toggle="modal"
@@ -99,6 +101,12 @@
                                 <option [value]="local.localId" *ngFor="let local of locales">{{local.descripcion}}</option>
                             </select>
                             <span *ngIf=" (almacen.localId == 0) && Local.touched " class="error-custom">Seleccione el local</span>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input [(ngModel)]="almacen.habilitado" type="checkbox" class="custom-control-input" name="Habilitar"  id="customSwitch1">
+                                <label class="custom-control-label" for="customSwitch1">Habilitar</label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">

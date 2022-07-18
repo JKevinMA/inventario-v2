@@ -37,6 +37,7 @@
                                     <th>Almacen</th>
                                     <th>Local</th>
                                     <th>Empresa</th>
+                                    <th>Estado</th> 
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -47,6 +48,7 @@
                                     <td>{{area.almacen}}</td>
                                     <td>{{area.local}}</td>
                                     <td>{{area.empresa}}</td>
+                                    <td>{{area.habilitado?'HABILITADO':'DESHABILITADO'}}</td>
                                     <td class="text-center">
                                         <div class="btn-group">
                                             <button (click)="editar(area)" type="button" class="btn btn-warning" data-toggle="modal"
@@ -109,6 +111,12 @@
                                 <option [value]="almacen.almacenId" *ngFor="let almacen of almacenes">{{almacen.descripcion}}</option>
                             </select>
                             <span *ngIf=" (area.almacenId == 0) && Almacen.touched " class="error-custom">Seleccione el almacen</span>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input [(ngModel)]="area.habilitado" type="checkbox" class="custom-control-input" name="Habilitar"  id="customSwitch1">
+                                <label class="custom-control-label" for="customSwitch1">Habilitar</label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">

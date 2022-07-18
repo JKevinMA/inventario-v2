@@ -4,7 +4,7 @@ export class Area{
     areaId!:number;
     descripcion!:string;
     almacenId!:number;
-
+    habilitado:boolean=false;
 
     articulos!:Articulo[];
     archivo:string='-';

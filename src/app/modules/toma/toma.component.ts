@@ -11,26 +11,32 @@ import Swal from 'sweetalert2';
   templateUrl: './toma.component.html',
   styleUrls: ['./toma.component.css']
 })
-export class TomaComponent implements OnInit,OnDestroy {
+export class TomaComponent implements OnInit, OnDestroy {
   user!: UsuarioModel;
-  inventariosAbiertos:InventarioCabecera[]=[];
+  inventariosAbiertos: InventarioCabecera[] = [];
 
-  inventarioIdSeleccionado=0;
-  paso_1=true;
-  paso_2=false;
+  inventarioIdSeleccionado = 0;
+  paso_1 = true;
+  paso_2 = false;
 
-  tomasInventarioDetalle:TomaInventarioDetalle[]=[];
-  localizaciones:string[] = [];
-  familias:string[] = [];
-  categorias:string[] = [];
+  tomasInventarioDetalle: TomaInventarioDetalle[] = [];
+  localizaciones: string[] = [];
+  familias: string[] = [];
+  categorias: string[] = [];
+  filtroNombre: string = '';
 
   dtOptions: DataTables.Settings = {};
   dtTrigger: Subject<any> = new Subject<any>();
 
+  fechaActual = new Date();
 
-  constructor(private api:ApiService) { }
+  constructor(private api: ApiService) {
+    this.fechaActual.setHours(0);
+    this.fechaActual.setMinutes(0);
+    this.fechaActual.setSeconds(0);
+  }
 
-  isLoading(){
+  isLoading() {
     Swal.fire({
       allowOutsideClick: false,
       width: '200px',
@@ -38,7 +44,7 @@ export class TomaComponent implements OnInit,OnDestroy {
     });
     Swal.showLoading();
   }
-  stopLoading(){
+  stopLoading() {
     Swal.close();
   }
   ngOnDestroy(): void {
@@ -48,27 +54,30 @@ export class TomaComponent implements OnInit,OnDestroy {
   ngOnInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
-      responsive:true
+      responsive: true
     };
     this.obtenerUsuario();
     this.obtenerInventariosAbiertos();
   }
 
-  verResumen(){
+  verResumen() {
     /* this.dtTrigger.lift;
     this.dtTrigger.next(); */
   }
 
-  obtenerInventariosAbiertos(){
+  obtenerInventariosAbiertos() {
     this.isLoading();
-    this.api.obtenerInventariosAbiertos(this.user.usuarioId,'APERTURADO').subscribe(r=>{
-      this.inventariosAbiertos = r.response!;
-      this.inventariosAbiertos.forEach(ia=>{
+    this.api.obtenerInventariosAbiertos(this.user.usuarioId, 'APERTURADO').subscribe(r => {
+      this.inventariosAbiertos = r.response!.map(x => Object.assign(new InventarioCabecera(), x));
+ 
+      //this.inventariosAbiertos = this.inventariosAbiertos.filter(ia => (new Date(ia.fechaVisualizacion) < new Date()));
+
+      this.inventariosAbiertos.forEach(ia => {
         ia.iniciado = false;
-        this.api.validarInicioInventario(ia.inventarioId,this.user.usuarioId).subscribe(vr=>{
-          if(vr.success){
-            if(vr.response?.total != 0){
-              ia.iniciado = vr.response!.total == 0?false:true;
+        this.api.validarInicioInventario(ia.inventarioId, this.user.usuarioId).subscribe(vr => {
+          if (vr.success) {
+            if (vr.response?.total != 0) {
+              ia.iniciado = vr.response!.total == 0 ? false : true;
               ia.cerrado = vr.response!.cerrado;
             }
           }
@@ -76,6 +85,8 @@ export class TomaComponent implements OnInit,OnDestroy {
         });
       });
       this.stopLoading();
+    }, error => {
+      console.log(error);
     });
   }
 
@@ -86,16 +97,16 @@ export class TomaComponent implements OnInit,OnDestroy {
     }
   }
 
-  iniciarInventario(inventarioId:number){
-    this.inventarioIdSeleccionado=inventarioId;
-    this.paso_1=false;
-    this.paso_2=true;
+  iniciarInventario(inventarioId: number) {
+    this.inventarioIdSeleccionado = inventarioId;
+    this.paso_1 = false;
+    this.paso_2 = true;
     this.isLoading();
-    this.api.obtenerTomaInventario(inventarioId,this.user.usuarioId).subscribe(r=>{
-      if(r.success){
+    this.api.obtenerTomaInventario(inventarioId, this.user.usuarioId).subscribe(r => {
+      if (r.success) {
         this.tomasInventarioDetalle = r.response!;
-        this.tomasInventarioDetalle.forEach(tid=>{
-          tid.error=false;
+        this.tomasInventarioDetalle.forEach(tid => {
+          tid.error = false;
         });
         this.todoTomasInventarioDetalle = [...this.tomasInventarioDetalle];
         this.cargarFiltros();
@@ -104,29 +115,29 @@ export class TomaComponent implements OnInit,OnDestroy {
     });
   }
 
-  onBlur(tID:TomaInventarioDetalle,inputCantidad:any){
-    
-    var tID_Copia = {...tID};
-    tID_Copia.cantidad = inputCantidad.value==''?0:+inputCantidad.value;
+  onBlur(tID: TomaInventarioDetalle, inputCantidad: any) {
+
+    var tID_Copia = { ...tID };
+    tID_Copia.cantidad = inputCantidad.value == '' ? 0 : +inputCantidad.value;
     tID_Copia.blanco = false;
 
-    this.api.guardarToma(tID_Copia).subscribe(r=>{
-      if(r.success){
-        if(r.response!=0){
-          tID.cantidad = inputCantidad.value==''?0:+inputCantidad.value;
+    this.api.guardarToma(tID_Copia).subscribe(r => {
+      if (r.success) {
+        if (r.response != 0) {
+          tID.cantidad = inputCantidad.value == '' ? 0 : +inputCantidad.value;
           tID.blanco = false;
           tID.error = false;
-        }else{
+        } else {
           tID.error = true;
           tID.blanco = true;
           /* tID.blanco = tID_Antes.blanco; */
         }
-      }else{
+      } else {
         tID.error = true;
         tID.blanco = true;
-       /*  tID.blanco = tID_Antes.blanco; */
+        /*  tID.blanco = tID_Antes.blanco; */
       }
-    },err=>{
+    }, err => {
       tID.error = true;
       tID.blanco = true;
       /* tID.blanco = tID_Antes.blanco; */
@@ -135,76 +146,76 @@ export class TomaComponent implements OnInit,OnDestroy {
   }
 
 
-  todoTomasInventarioDetalle:TomaInventarioDetalle[]=[];
-  filtrar(){
-
+  todoTomasInventarioDetalle: TomaInventarioDetalle[] = [];
+  filtrar() {
     this.tomasInventarioDetalle = [...this.todoTomasInventarioDetalle];
-    
-    var filtIngreso =  (this.filtroIngreso == 0?false:true);
-    var filtrado = this.tomasInventarioDetalle.filter(tid => tid.blanco == (this.filtroIngreso!=2? filtIngreso :tid.blanco) && tid.localizacion ==  (this.filtroLocalizacion=='0'?tid.localizacion:this.filtroLocalizacion) && tid.categoria ==  (this.filtroCategoria=='0'?tid.categoria:this.filtroCategoria)  && tid.familia ==  (this.filtroFamilia=='0'?tid.familia:this.filtroFamilia) );
+
+    var filtIngreso = (this.filtroIngreso == 0 ? false : true);
+
+    var filtrado = this.tomasInventarioDetalle.filter(tid => tid.blanco == (this.filtroIngreso != 2 ? filtIngreso : tid.blanco) && tid.localizacion == (this.filtroLocalizacion == '0' ? tid.localizacion : this.filtroLocalizacion) && tid.categoria == (this.filtroCategoria == '0' ? tid.categoria : this.filtroCategoria) && tid.familia == (this.filtroFamilia == '0' ? tid.familia : this.filtroFamilia) && tid.articulo.toLowerCase().includes((this.filtroNombre == '' ? tid.articulo.toLowerCase() : this.filtroNombre.toLowerCase())));
+
     this.tomasInventarioDetalle = filtrado;
-    /* if(this.filtroIngreso!=2){
-    } */
+
   }
 
-  filtroIngreso:number=2;
+  filtroIngreso: number = 2;
   filtroLocalizacion = '0';
   filtroFamilia = '0';
   filtroCategoria = '0';
-  cargarFiltros(){
+  cargarFiltros() {
 
     this.localizaciones = [];
-    var loc:string[] =[];
+    var loc: string[] = [];
 
-    this.familias=[];
-    var fam:string[]=[];
+    this.familias = [];
+    var fam: string[] = [];
 
-    this.categorias=[];
-    var cat:string[]=[];
-    
-    this.todoTomasInventarioDetalle.forEach(f=>{
+    this.categorias = [];
+    var cat: string[] = [];
+
+    this.todoTomasInventarioDetalle.forEach(f => {
       loc.push(f.localizacion);
       cat.push(f.categoria);
       fam.push(f.familia);
     });
 
-    let resLoc = loc.filter((item,index)=>{
+    let resLoc = loc.filter((item, index) => {
       return loc.indexOf(item) === index;
     });
     resLoc = resLoc.sort();
-    this.localizaciones= resLoc;
+    this.localizaciones = resLoc;
 
-    let resFam = fam.filter((item,index)=>{
+    let resFam = fam.filter((item, index) => {
       return fam.indexOf(item) === index;
     });
     resFam = resFam.sort();
-    this.familias= resFam;
+    this.familias = resFam;
 
-    let resCat = cat.filter((item,index)=>{
+    let resCat = cat.filter((item, index) => {
       return cat.indexOf(item) === index;
     });
     resCat = resCat.sort();
-    this.categorias= resCat;
+    this.categorias = resCat;
   }
 
-  salir(){
-    this.paso_1=true;
-    this.paso_2=false;
-    this.todoTomasInventarioDetalle=[];
-    this.tomasInventarioDetalle=[];
-    this.inventarioIdSeleccionado=0;
+  salir() {
+    this.paso_1 = true;
+    this.paso_2 = false;
+    this.todoTomasInventarioDetalle = [];
+    this.tomasInventarioDetalle = [];
+    this.inventarioIdSeleccionado = 0;
 
     this.obtenerInventariosAbiertos();
   }
 
-  cerrarToma(){
-    
+  cerrarToma() {
+
     Swal.fire({
       title: 'Confirmación',
       text: 'Seguro de cerrar la toma de inventario?',
       showDenyButton: true,
       showCancelButton: false,
-      confirmButtonText: `Cerrar`,
+      confirmButtonText: `Cerrar toma`,
       denyButtonText: `Cancelar`,
       allowOutsideClick: false,
       icon: 'info'
@@ -219,13 +230,13 @@ export class TomaComponent implements OnInit,OnDestroy {
         });
 
         Swal.showLoading();
-        
+
         var tic = new TomaInventarioCabecera();
         tic.tomaInventarioId = this.todoTomasInventarioDetalle[0].tomaInventarioId;
 
         this.api.cerrarToma(tic).subscribe(r => {
           if (r.success) {
-            if(r.response! > 0){
+            if (r.response! > 0) {
               Swal.fire({
                 allowOutsideClick: false,
                 icon: 'success',
@@ -244,7 +255,7 @@ export class TomaComponent implements OnInit,OnDestroy {
           }
         }, err => {
           console.log(err);
-        
+
           if (err.name == "HttpErrorResponse") {
             Swal.fire({
               allowOutsideClick: false,
@@ -267,5 +278,7 @@ export class TomaComponent implements OnInit,OnDestroy {
       }
     });
   }
-
+  deseleccionarInventario() {
+    window.location.reload();
+  }
 }

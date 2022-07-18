@@ -7,6 +7,7 @@ export class Articulo{
     categoriaId!:number;
     familiaId!:number;
     unidadMedidaId!:number;
+    habilitado:boolean=false;
 
     //aux
     stockTeorico!:number;

@@ -1,0 +1,45 @@
+<div>
+    <br>
+    <div class="row">
+        <div class="col-6">
+            <label>Mostrar &nbsp;&nbsp;</label>
+            <select (change)="cambiaItemsPorPagina()" [(ngModel)]="numItemsPerPage" name="ItemsPerPage" id="inputGroupSelect01">
+                <option value="5">5</option>
+                <option value="10">10</option>
+            </select>
+            <label >&nbsp;&nbsp;resultados    
+            </label>
+        </div>
+        <div class="col-6">
+            <input type="email" (keyup)="ingresaBusqueda($event)" class="form-control form-control-sm"  placeholder="Buscar" id="exampleInputEmail1" aria-describedby="emailHelp">
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <table class="table table-sm table row-border hover">
+            <thead class="thead-light">
+                <tr>
+                    <th *ngFor="let cabecera of cabeceras" (click)="ordenar(cabecera)" >{{cabecera.nombre}} <i *ngIf="cabecera.ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabecera.ordenar==2" class="fas fa-angle-down"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of itemsPaginado[currentPage-1]"  >
+                    <td [class.text-right]="cabecera.moneda" *ngFor="let cabecera of cabeceras" >{{ cabecera.tipo=='moneda'? (item[cabecera.id] | currency:'S/. ')  : (cabecera.tipo=='booleano'? (item[cabecera.id]? 'Sí':'No') :item[cabecera.id]) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row justify-content-around">
+        <div class="col">
+            <p><b>{{items.length}}</b> resultados</p>
+            
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination" >
+                <li class="page-item" [class.active]="currentPage==page" 
+                (click)="currentPage=page" *ngFor="let page of pages" selected><a class="page-link" >{{ page }}</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+

@@ -14,4 +14,5 @@ export class ArticuloTipoInventario{
     localId!:number;
     empresa!:string;
     empresaId!:number;
+    habilitado:boolean=true;
 }

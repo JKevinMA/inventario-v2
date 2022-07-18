@@ -3,3 +3,21 @@
     color: #dd3545;
     font-size: 14px;
 }
+
+.dataTables_length{
+    padding-left: 20px;
+    padding-top: 20px;
+    /* margin-left: 20px; */
+}
+.dataTables_filter{
+    padding-right: 20px;
+    padding-top: 20px;
+}
+.dataTables_info{
+    padding-left: 20px;
+    padding-bottom: 20px;
+}
+.dataTables_paginate{
+    padding-right: 20px;
+    /* padding-bottom: 20px; */
+}

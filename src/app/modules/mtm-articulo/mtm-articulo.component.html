@@ -42,6 +42,7 @@
                                     <th>Categoria</th>
                                     <th>Familia</th>
                                     <th>Empresa</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -54,6 +55,7 @@
                                     <td>{{articulo.categoria}}</td>
                                     <td>{{articulo.familia}}</td>
                                     <td>{{articulo.empresa}}</td>
+                                    <td>{{articulo.habilitado?'HABILITADO':'DESHABILITADO'}}</td>
                                     <td class="text-center">
                                         <div class="btn-group">
                                             <button (click)="editar(articulo)" type="button" class="btn btn-warning"
@@ -142,6 +144,12 @@
                                 <option [value]="familia.familiaId" *ngFor="let familia of familias">{{familia.descripcion}}</option>
                             </select>
                             <span *ngIf=" (articulo.familiaId == 0) && Familia.touched " class="error-custom">Seleccione la familia</span>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input [(ngModel)]="articulo.habilitado" type="checkbox" class="custom-control-input" name="Habilitar"  id="customSwitch1">
+                                <label class="custom-control-label" for="customSwitch1">Habilitar</label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">

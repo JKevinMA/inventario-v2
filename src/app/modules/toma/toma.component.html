@@ -26,13 +26,14 @@
                         <table class="table row-border hover ">
                             <thead class="thead-light">
                                 <tr>
+                                    <th>Accion</th>
                                     <th>ID</th>
                                     <th>Almacen</th>
                                     <th>Area</th>
                                     <th>Tipo de Inventario</th>
-                                    <th>Fecha Apertura</th>
-                                    <th>Hora Apertura</th>
-                                    <th>Accion</th>
+                                    <th>Fecha de Inicio</th>
+                                    <!-- <th>Fecha Visualizacion</th>
+                                    <th>Hora Visualizacion</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,21 +42,22 @@
                                 </tr>
                                 <tr *ngFor="let inventarioAbierto of inventariosAbiertos"
                                     [class.table-success]="inventarioIdSeleccionado==inventarioAbierto.inventarioId">
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" [class.btn-secondary]="inventarioAbierto.cerrado" [disabled]="paso_2 || inventarioAbierto.cerrado || (inventarioAbierto.getFechaInicio() > fechaActual) "
+                                            *ngIf="inventarioIdSeleccionado!=inventarioAbierto.inventarioId"
+                                            (click)="iniciarInventario(inventarioAbierto.inventarioId);"
+                                            type="button">{{inventarioAbierto.cerrado?'Cerrado':(inventarioAbierto.iniciado?'Continuar':'Iniciar')}}</button>
+                                        <button class="btn btn-sm btn-danger" (click)="deseleccionarInventario()"
+                                            *ngIf="inventarioIdSeleccionado==inventarioAbierto.inventarioId"> Salir
+                                        </button>
+                                    </td>
                                     <td>{{inventarioAbierto.inventarioId}}</td>
                                     <td>{{inventarioAbierto.almacen}}</td>
                                     <td>{{inventarioAbierto.area}}</td>
                                     <td>{{inventarioAbierto.tipoInventario}}</td>
-                                    <td>{{inventarioAbierto.fechaInicio | date:"mediumDate"}}</td>
-                                    <td>{{inventarioAbierto.fechaInicio | date:"shortTime"}}</td>
-                                    <td>
-                                        <button class="btn btn-primary" [class.btn-secondary]="inventarioAbierto.cerrado" [disabled]="paso_2 || inventarioAbierto.cerrado"
-                                            *ngIf="inventarioIdSeleccionado!=inventarioAbierto.inventarioId"
-                                            (click)="iniciarInventario(inventarioAbierto.inventarioId);"
-                                            type="button">{{inventarioAbierto.cerrado?'Cerrado':(inventarioAbierto.iniciado?'Continuar':'Iniciar')}}</button>
-                                        <button class="btn btn-success" [disabled]="paso_2"
-                                            *ngIf="inventarioIdSeleccionado==inventarioAbierto.inventarioId"> En curso
-                                        </button>
-                                    </td>
+                                    <td>{{inventarioAbierto.fechaInicio | date:'yyyy-MM-dd'}}</td>
+                                    <!-- <td>{{inventarioAbierto.fechaVisualizacion | date:"mediumDate"}}</td>
+                                    <td>{{inventarioAbierto.fechaVisualizacion | date:"shortTime"}}</td> -->
                                 </tr>
                             </tbody>
                         </table>
@@ -74,7 +76,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="selectIngreso">Filtro por ingreso</label>
-                                    <select [(ngModel)]="filtroIngreso"  class="form-control" id="selectIngreso">
+                                    <select (change)="filtrar()" [(ngModel)]="filtroIngreso"  class="form-control" id="selectIngreso">
                                         <option value="2">Todos</option>
                                         <option value="0">Con valores ingresados</option>
                                         <option value="1">Sin valores ingresados</option>
@@ -84,7 +86,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="selectLocalizacion">Filtro por localización</label>
-                                    <select [(ngModel)]="filtroLocalizacion" class="form-control" id="selectLocalizacion">
+                                    <select (change)="filtrar()" [(ngModel)]="filtroLocalizacion" class="form-control" id="selectLocalizacion">
                                         <option value="0">Todos</option>
                                         <option [value]="loc" *ngFor="let loc of localizaciones">{{loc}}</option>
                                     </select>
@@ -93,7 +95,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="selectCategoria">Filtro por Categoria</label>
-                                    <select [(ngModel)]="filtroCategoria" class="form-control" id="selectCategoria">
+                                    <select (change)="filtrar()" [(ngModel)]="filtroCategoria" class="form-control" id="selectCategoria">
                                         <option value="0">Todos</option>
                                         <option [value]="cat" *ngFor="let cat of categorias">{{cat}}</option>
                                     </select>
@@ -102,19 +104,16 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="selectFamilia">Filtro por Familia</label>
-                                    <select [(ngModel)]="filtroFamilia" class="form-control" id="selectFamilia">
+                                    <select (change)="filtrar()" [(ngModel)]="filtroFamilia" class="form-control" id="selectFamilia">
                                         <option value="0">Todos</option>
                                         <option [value]="fam" *ngFor="let fam of familias">{{fam}}</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-2">
-                                
                                 <div class="form-group">
-                                    <button [disabled]="paso_1" id="select" type="button"
-                                        class="btn btn-outline-primary btn-block" (click)="filtrar()">
-                                        Filtrar
-                                    </button>
+                                    <label for="inputSearch">Filtro por Nombre</label>
+                                    <input type="text" class="form-control" id="inputSearch" [(ngModel)]="filtroNombre" (change)="filtrar()" placeholder="Ingrese nombre...">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -153,8 +152,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-default">
-        <div class="modal-dialog">
+    <div class="modal fade " id="modal-default">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 
                     <div class="modal-header">
@@ -165,7 +164,10 @@
                     </div>
                     <div class="modal-body table-responsive">
                         <!-- <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover"> -->
-                            <table class="table" class="table row-border hover">
+                        
+                            <app-custom-table [items]="todoTomasInventarioDetalle" [cabeceras]="[{id:'codigo',nombre:'Codigo',ordenar:0},{id:'articulo',nombre:'Articulo',ordenar:0},{id:'blanco',nombre:'En blanco',ordenar:0,tipo:'booleano'},{id:'unidadMedida',nombre:'Unidad Medida',ordenar:0},{id:'cantidad',nombre:'Cantidad',ordenar:0}]"></app-custom-table>
+
+                            <!--  <table class="table" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Codigo</th>
@@ -182,7 +184,7 @@
                                     <td>{{ttid.cantidad}}</td>
                                 </tr>
                             </tbody>
-                        </table>
+                        </table> -->
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal"> Cancelar</button>

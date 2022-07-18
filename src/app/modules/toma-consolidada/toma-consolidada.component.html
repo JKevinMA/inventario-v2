@@ -1,0 +1,127 @@
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Toma de Inventario Consolidada</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Reportes</a></li>
+                    <li class="breadcrumb-item active">Toma de Inventario Consolidada</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="row-right p-3">
+                    <label for="agrupar">Agrupar por:</label>
+                    <select name="" [(ngModel)]="tipoAgrupacion" class="form-control ml-2" style="width: 150px;"
+                        id="agrupar">
+                        <option value="AREA">Área</option>
+                        <option value="ALMACEN">Almacén</option>
+                        <option value="LOCAL">Local</option>
+                    </select>
+                    <label for="" class="ml-4">Fecha:</label>
+                    <div class="input-group date ml-2" id="datetimepicker4" style="width: 200px;" data-target-input="nearest">
+                        <input [(ngModel)]="model" class="form-control"  placeholder="yyyy-mm-dd"
+                            name="dp" ngbDatepicker #d="ngbDatepicker">
+                        <div class="input-group-append calendar" (click)="d.toggle()">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                    <button (click)="buscarConsolidadaCabecera()" class="btn btn-primary ml-4">
+                        <i class="fas fa-window-restore"></i>
+                        Consolidar</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Tomas de inventarios consolidadas</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo Inventario</th>
+                                    <th>Cantidad de Inventarios</th>
+                                    <th>Fecha</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center" *ngIf="tomasConsolidadaCabecera.length==0">
+                                    <td colspan="5">No existen tomas de inventarios con los parámetros consultados</td>
+                                </tr>
+                                <tr *ngFor="let tcc of tomasConsolidadaCabecera; let i = index"
+                                    [class.table-success]="i==indexSeleccionado">
+                                    <td>{{tcc.tipo}}</td>
+                                    <td>{{tcc.nombre}}</td>
+                                    <td>{{tcc.tipoInventario}}</td>
+                                    <td>{{tcc.cantidadInventarios}}</td>
+                                    <td>{{ tcc.fecha }}</td>
+                                    <td><button (click)="buscarConsolidadaDetalle(tcc.tipoInventarioId!,tcc.id!)" class="btn btn-sm btn-primary"
+                                            *ngIf="i!=indexSeleccionado"
+                                            (click)="indexSeleccionado=i;"
+                                            type="button">Ver</button>
+                                        <button class="btn btn-sm btn-primary"
+                                            *ngIf="i==indexSeleccionado" (click)="indexSeleccionado=-1;"> Seleccionado
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="indexSeleccionado!=-1">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Detalles de toma de inventario seleccionada</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        
+                        <table class="table row-border hover ">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Articulo</th>
+                                    <th>Unidad de Medida</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center" *ngIf="tomasConsolidadaDetalle.length==0">
+                                    <td colspan="4">No existen tomas de inventarios con los parámetros consultados</td>
+                                </tr>
+
+                                <tr *ngFor="let tcd of tomasConsolidadaDetalle; let i = index">
+                                    <td>{{tcd.codigo}}</td>
+                                    <td>{{tcd.articulo}}</td>
+                                    <td>{{tcd.unidadMedida}}</td>
+                                    <td style="text-align: end;">{{tcd.cantidad}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div (click)="exportar()" class="m-3" style="display:flex;justify-content: end;">
+                            <button class="btn btn-success">Exportar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

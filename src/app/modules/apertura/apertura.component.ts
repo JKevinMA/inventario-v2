@@ -12,6 +12,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { ViewChild } from '@angular/core';
 import { InventarioCabecera, InventarioDetalle } from 'src/app/models/inventario.model';
 import Swal from 'sweetalert2';
+import { NgbCalendar, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-apertura',
   templateUrl: './apertura.component.html',
@@ -26,6 +27,11 @@ export class AperturaComponent implements OnInit,OnDestroy {
   almacenId = 0;
   tiposInventario!: TipoInventario[];
   tipoInventarioId = 0;
+  modelFechaInicio?: NgbDateStruct;
+  modelFechaVisualizacion?: NgbDateStruct;
+  limiteFecha?: NgbDateStruct;
+  time = {hour: 13, minute: 30};
+  meridian = true;
 
   area: Area = new Area();
   articulosAlerta: Articulo[] = [];
@@ -36,10 +42,17 @@ export class AperturaComponent implements OnInit,OnDestroy {
   dtOptions: DataTables.Settings = {};
   dtTrigger: Subject<any> = new Subject<any>();
 
+  cabeceras:any[] = [{id:'codigo',nombre:'Codigo',ordenar:0,moneda:false},{id:'descripcion',nombre:'Articulo',ordenar:0,moneda:false},{id:'stockTeorico',nombre:'Stock Teorico',ordenar:0,moneda:false},{id:'precioPromedio',nombre:'Precio Promedio',ordenar:0,moneda:true}];
+
   readExcel!: ReadexcelDirective;
   @ViewChild('myInputFile')
   myInputFile!: ElementRef;
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService, private calendar: NgbCalendar) { 
+    this.modelFechaInicio = this.calendar.getToday();
+    this.modelFechaVisualizacion = this.calendar.getToday();
+    this.limiteFecha = this.calendar.getToday();
+    this.time = {hour:new Date().getHours(), minute: new Date().getMinutes()};
+  }
   ngOnDestroy(): void {
     this.dtTrigger.unsubscribe();
   }
@@ -65,12 +78,14 @@ export class AperturaComponent implements OnInit,OnDestroy {
       this.stopLoading();
     });
   }
+
   obtenerUsuario() {
     var objectUser = localStorage.getItem('user-inventario-application');
     if (objectUser != null) {
       this.user = JSON.parse(objectUser);
     }
   }
+
   submitCriterios(formulario: NgForm) {
     if (this.localId == 0 || this.tipoInventarioId == 0) return;
 
@@ -80,26 +95,43 @@ export class AperturaComponent implements OnInit,OnDestroy {
     this.almacenes = [];
     this.isLoading();
     this.api.obtenerAlmacenes(this.localId).subscribe(r => {
-      this.almacenes = r.response!;
-      this.almacenes.forEach(almacen => {
-        almacen.selected = false;
-        this.api.obtenerAreas(almacen.almacenId).subscribe(r_areas => {
-          almacen.areas = r_areas.response!;
-          almacen.areas.forEach(a => {
-            a.selected = false;
-            a.archivo = '-';
-            this.api.obtenerArticulosTipoInventario(this.tipoInventarioId, a.areaId).subscribe(r_articulos => {
-              a.articulos = r_articulos.response!;
-              a.articulos.forEach(a => {
-                a.stockTeorico = 0;
-                a.precioPromedio = 0.0;
+      if(r.success){
+        this.almacenes = r.response!;
+        this.almacenes.forEach(almacen => {
+          almacen.selected = false;
+          this.api.obtenerAreas(almacen.almacenId).subscribe(r_areas => {
+            if(r_areas.success){
+              almacen.areas = r_areas.response!;
+              almacen.areas.forEach(a => {
+                a.selected = false;
+                a.archivo = '-';
+                this.api.obtenerArticulosTipoInventario(this.tipoInventarioId, a.areaId).subscribe(r_articulos => {
+                  if(r_articulos.success){
+                    a.articulos = r_articulos.response!;
+                    a.articulos.forEach(a => {
+                      a.stockTeorico = 0;
+                      a.precioPromedio = 0.0;
+                    });
+                  }else{
+                    console.log(r_articulos.message);
+                  }
+                });
               });
-              this.stopLoading();
-            });
-          });
+            }else{
+              console.log(r.message);
+            }
+          })
         })
-      })
+      }else{
+        console.log(r.message);
+      }
+      
+    },error=>{
+      console.log(error);
+    },()=>{
+      this.stopLoading();
     });
+
   }
 
   seleccionaLocal() {
@@ -129,18 +161,14 @@ export class AperturaComponent implements OnInit,OnDestroy {
   }
 
   DataFromEventEmmiter(o: any) {
-    /* this.area.articulos.map((val,ind)=>{
-      val.stockTeorico = 0;
-      val.precioPromedio = 0;
-    }); */
     console.log('DataFromEventEmmiter', o);
     this.articulosAlerta = [];
     for (let i = 0; i < o.length; i++) {
       var noExiste = false;
       for (let j = 0; j < this.area.articulos.length; j++) {
         if (o[i]['codigo'] == this.area.articulos[j].codigo) {
-          this.area.articulos[j].stockTeorico = o[i]['stockTeorico'];
-          this.area.articulos[j].precioPromedio = o[i]['precioPromedio'];
+          this.area.articulos[j].stockTeorico = + o[i]['stockTeorico'];
+          this.area.articulos[j].precioPromedio = + o[i]['precioPromedio'];
           noExiste = false;
           break;
         } else {
@@ -200,6 +228,7 @@ export class AperturaComponent implements OnInit,OnDestroy {
     this.paso_2 = false;
     this.almacenes = [];
   }
+
   aperturar() {
 
     Swal.fire({
@@ -225,6 +254,8 @@ export class AperturaComponent implements OnInit,OnDestroy {
               inv.usuarioId = this.user.usuarioId;
               inv.tipoInventarioId = +this.tipoInventarioId;
               inv.areaId = ar.areaId;
+              inv.fechaInicio = new Date(this.modelFechaInicio!.year, this.modelFechaInicio!.month - 1, this.modelFechaInicio!.day,0.0 - 5,0.0);
+              inv.fechaVisualizacion = new Date(this.modelFechaVisualizacion!.year, this.modelFechaVisualizacion!.month - 1, this.modelFechaVisualizacion!.day, this.time!.hour - 5, this.time!.minute);
               inv.detalles = [];
               ar.articulos.forEach(art => {
                 var invDeta = new InventarioDetalle();
@@ -237,8 +268,6 @@ export class AperturaComponent implements OnInit,OnDestroy {
             }
           });
         });
-
-        console.log(inventarios);
 
         Swal.fire({
           allowOutsideClick: false,
@@ -321,6 +350,7 @@ export class AperturaComponent implements OnInit,OnDestroy {
                   text: 'Se han aperturado los inventarios correctamente!',
                 }).then((result) => {
                   window.location.reload();
+                  console.log('EXITO');
                 });
               } else {
                 Swal.fire({
@@ -366,6 +396,9 @@ export class AperturaComponent implements OnInit,OnDestroy {
   stopLoading(){
     Swal.close();
   }
-
+  parsearFecha(f: NgbDateStruct): string {
+    var fecha = new Date(f.year, f.month - 1, f.day)
+    return fecha.toISOString().substring(0, 10);
+  }
 }
 

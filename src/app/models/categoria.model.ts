@@ -3,4 +3,5 @@ export class Categoria{
     descripcion!:string;
     empresaId!:number;
     empresa!:string;
+    codigo!:string;
 }

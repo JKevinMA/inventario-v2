@@ -22,16 +22,16 @@
                   <div class="card-header p-0 pt-1 border-bottom-0">
                     <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
                       <li class="nav-item">
-                        <a class="nav-link active" id="custom-tabs-three-inventarios-abiertos-tab" data-toggle="pill" href="#custom-tabs-inventarios-abiertos-home" role="tab" aria-controls="custom-tabs-inventarios-abiertos-home" aria-selected="false">Inventarios Aperturados</a>
+                        <a class="nav-link active" id="custom-tabs-three-inventarios-abiertos-tab" data-toggle="pill" href="#custom-tabs-inventarios-abiertos-home" role="tab" aria-controls="custom-tabs-inventarios-abiertos-home" aria-selected="false" (click)="deseleccionarInventario()">Inventarios Aperturados</a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link " id="custom-tabs-three-inventarios-cerrados-tab" data-toggle="pill" href="#custom-tabs-three-inventarios-abiertos" role="tab" aria-controls="custom-tabs-three-inventarios-abiertos" aria-selected="true">Inventarios Cerrados</a>
+                        <a class="nav-link " id="custom-tabs-three-inventarios-cerrados-tab" data-toggle="pill" href="#custom-tabs-three-inventarios-abiertos" role="tab" aria-controls="custom-tabs-three-inventarios-abiertos" aria-selected="true" (click)="deseleccionarInventario()">Inventarios Cerrados</a>
                       </li>
                     </ul>
                   </div>
-                  <div class="card-body  table-responsive">
+                  <div class="card-body  table-responsive p-0">
                     <div class="tab-content " id="custom-tabs-three-tabContent">
-                      <div class="tab-pane fade active show" id="custom-tabs-inventarios-abiertos-home" role="tabpanel" aria-labelledby="custom-tabs-three-inventarios-abiertos-tab">
+                      <div class="tab-pane fade active show " id="custom-tabs-inventarios-abiertos-home" role="tabpanel" aria-labelledby="custom-tabs-three-inventarios-abiertos-tab">
                         <table class="table row-border hover ">
                             <thead class="thead-light">
                                 <tr>
@@ -40,7 +40,7 @@
                                     <th>Area</th>
                                     <th>Tipo de Inventario</th>
                                     <th>Fecha Aperturado</th>
-                                    <th>Hora Aperturado</th>
+                                    <!-- <th>Hora Aperturado</th> -->
                                     <th>Accion</th>
                                 </tr>
                             </thead>
@@ -48,22 +48,22 @@
                                 <tr *ngIf="inventariosAbiertos.length==0">
                                    <td colspan="7" class="text-center">No existen inventarios aperturados por finalizar</td> 
                                 </tr>
-                                <tr *ngFor="let inventarioAbierto of inventariosAbiertos"
+                                <tr  *ngFor="let inventarioAbierto of inventariosAbiertos"
                                     [class.table-success]="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
                                     <td>{{inventarioAbierto.inventarioId}}</td>
                                     <td>{{inventarioAbierto.almacen}}</td>
                                     <td>{{inventarioAbierto.area}}</td>
                                     <td>{{inventarioAbierto.tipoInventario}}</td>
                                     <td>{{inventarioAbierto.fechaInicio | date:"mediumDate"}}</td>
-                                    <td>{{inventarioAbierto.fechaInicio | date:"shortTime"}}</td>
+                                    <!-- <td>{{inventarioAbierto.fechaInicio | date:"shortTime"}}</td> -->
                                     <td>
-                                        <button class="btn btn-primary" type="button" [disabled]="paso_2"
+                                        <button class="btn btn-sm btn-primary" type="button" 
                                             (click)="forzarYObtenerTomasUsuarios(inventarioAbierto)"
                                             *ngIf="inventarioSeleccionado.inventarioId!=inventarioAbierto.inventarioId">Forzar
                                             Cierre</button>
-                                        <button class="btn btn-success" [disabled]="paso_2"
+                                        <button class="btn btn-sm btn-danger" [disabled]="paso_2"
                                             *ngIf="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
-                                            En curso
+                                            Salir
                                         </button>
                                     </td>
                                 </tr>
@@ -71,7 +71,7 @@
                         </table>
                       </div>
                       <div class="tab-pane fade" id="custom-tabs-three-inventarios-abiertos" role="tabpanel" aria-labelledby="custom-tabs-three-inventarios-cerrados-tab">
-                        <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table" class="table row-border hover">
+                        <table class="table" class="table row-border hover">
                             <thead class="thead-light">
                                 <tr>
                                     <th>ID</th>
@@ -87,7 +87,7 @@
                                 <tr *ngIf="inventariosCerrados.length==0">
                                    <td colspan="6" class="text-center">No se encontraron Inventarios Cerrados</td> 
                                 </tr>
-                                <tr *ngFor="let inventarioCerrado of inventariosCerrados">
+                                <tr [class.table-success]="inventarioSeleccionado.inventarioId==inventarioCerrado.inventarioId" *ngFor="let inventarioCerrado of inventariosCerrados">
                                     <td>{{inventarioCerrado.inventarioId}}</td>
                                     <td>{{inventarioCerrado.almacen}}</td>
                                     <td>{{inventarioCerrado.area}}</td>
@@ -95,14 +95,13 @@
                                     <td>{{inventarioCerrado.fechaFin | date:"mediumDate"}}</td>
                                     <td>{{inventarioCerrado.fechaFin | date:"shortTime"}}</td>
                                     <td>
-                                        <button *ngIf="inventarioSeleccionado.inventarioId!=inventarioCerrado.inventarioId" type="button" class="btn btn-primary" [disabled]="paso_2" (click)="verResumen(inventarioCerrado)">Ver Resumen</button>
-                                        
-                                        <button class="btn btn-success" [disabled]="paso_2"
+                                        <button *ngIf="inventarioSeleccionado.inventarioId!=inventarioCerrado.inventarioId" type="button" class="btn btn-sm btn-primary" (click)="verResumen(inventarioCerrado)">Ver Resumen</button>
+
+                                        <button (click)="deseleccionarInventario()" class="btn btn-sm btn-danger"
                                             *ngIf="inventarioSeleccionado.inventarioId==inventarioCerrado.inventarioId">
-                                            En curso
+                                            Salir
                                         </button>
                                     </td>
-                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -112,56 +111,13 @@
                   </div>
                 </div>
               </div>
-            <!-- <div class="col-md-12">
-                <div class="card " [class.card-primary]="paso_1" [class.card-secondary]="paso_2">
-                    <div class="card-header">
-                        <h3 class="card-title">Lista de inventarios aperturados </h3>
-                    </div>
-                    <div class="card-body table-responsive p-0">
-                        <table class="table row-border hover ">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Almacen</th>
-                                    <th>Area</th>
-                                    <th>Tipo de Inventario</th>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
-                                    <th>Accion</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let inventarioAbierto of inventariosAbiertos"
-                                    [class.table-success]="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
-                                    <td>{{inventarioAbierto.inventarioId}}</td>
-                                    <td>{{inventarioAbierto.almacen}}</td>
-                                    <td>{{inventarioAbierto.area}}</td>
-                                    <td>{{inventarioAbierto.tipoInventario}}</td>
-                                    <td>{{inventarioAbierto.fechaInicio | date:"mediumDate"}}</td>
-                                    <td>{{inventarioAbierto.fechaInicio | date:"shortTime"}}</td>
-                                    <td>
-                                        <button class="btn btn-primary" type="button" [disabled]="paso_2"
-                                            (click)="forzarYObtenerTomasUsuarios(inventarioAbierto)"
-                                            *ngIf="inventarioSeleccionado.inventarioId!=inventarioAbierto.inventarioId">Forzar
-                                            Cierre</button>
-                                        <button class="btn btn-success" [disabled]="paso_2"
-                                            *ngIf="inventarioSeleccionado.inventarioId==inventarioAbierto.inventarioId">
-                                            En curso
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> -->
         </div>
         <div class="row" *ngIf="paso_2">
             <div [class.col-md-9]="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' "
                 [class.col-md-12]="inventarioSeleccionado.archivoStock == null || inventarioSeleccionado.archivoStock == '-' ">
                 <div class="card " [class.card-primary]="paso_2" [class.card-secondary]="paso_1">
                     <div class="card-header">
-                        <h3 class="card-title">Usuarios que tomaron inventario - InventarioID: {{inventarioSeleccionado.inventarioId}} </h3>
+                        <h3 class="card-title">Usuarios que tomaron inventario - ID: {{inventarioSeleccionado.inventarioId}} </h3>
                     </div>
                     <div class="card-body table-responsive p-0">
                         <table class="table row-border hover ">
@@ -175,23 +131,27 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr *ngIf="tomasInventarioUsuario.length==0">
+                                    <td colspan="5" class="text-center"> No se encontraron tomas de inventario de ningún usuario.</td>
+                                </tr>
                                 <tr *ngFor="let lTIC of tomasInventarioUsuario">
                                     <td>{{lTIC.usuario}}</td>
                                     <td>{{lTIC.nombre}}</td>
                                     <td>{{lTIC.fechaInicio|date:"medium"}}</td>
                                     <td *ngIf="lTIC.cerrado">{{lTIC.fechaFin |date:"medium" }}</td>
                                     <td *ngIf="!lTIC.cerrado">-</td>
-                                    <td> <button class="btn btn-success" data-toggle="modal"
-                                            data-target="#modal-detalle"
-                                            (click)="obtenerTomaDetalle(lTIC.tomaInventarioId)"> <i
-                                                class="far fa-eye"></i></button> </td>
+                                    <td> 
+                                        <a href="#" data-toggle="modal"
+                                        data-target="#modal-detalle"
+                                        (click)="obtenerTomaDetalle(lTIC.tomaInventarioId)">Ver toma</a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="modal-footer" *ngIf="inventarioSeleccionado.archivoStock == '-' && !esResumen">
+                       <!--  <div class="modal-footer" *ngIf="(inventarioSeleccionado.archivoStock == '-' || inventarioSeleccionado.archivoStock==null ) && !esResumen">
                             <button  type="button" (click)="finalizar()" [disabled]="paso_1" class="btn btn-success">
                                 Finalizar</button>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -217,43 +177,77 @@
                 </div>
             </div>
         </div>
+        
+
+        <!-- *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' " -->
         <div class="row"
-            *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' ">
+            *ngIf="paso_2"
+            >
             <div class="col-md-12">
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Validando Inventario - InventarioID: {{inventarioSeleccionado.inventarioId}}</h3>
+                        <h3 class="card-title" *ngIf="esResumen"> Consolidacion de inventario - ID: {{inventarioSeleccionado.inventarioId}}</h3>
+                        <h3 class="card-title" *ngIf="!esResumen" >Validando inventario  - ID: {{inventarioSeleccionado.inventarioId}}</h3>
                     </div>
                     <div class="card-body table-responsive p-0">
+                        <div class="row p-4">
+                            <div class="col-6">
+                                <label>Mostrar &nbsp;&nbsp;</label>
+                                <select (change)="cambiaItemsPorPagina()" [(ngModel)]="numItemsPerPage" name="ItemsPerPage" id="inputGroupSelect01">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                </select>
+                                <label >&nbsp;&nbsp;resultados    
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="email" (keyup)="ingresaBusqueda($event)" class="form-control form-control-sm"  placeholder="Buscar" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            </div>
+                        </div>
                         <table class="table row-border hover ">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Codigo</th>
-                                    <th>Articulo</th>
-                                    <th>Stock Teorico</th>
-                                    <th>Stock Fisico</th>
-                                    <th>Faltante</th>
-                                    <th>Diferencia Valor</th>
-                                    <th>Validar</th>
-                                    <th>Faltante Final</th>
+                                    <!-- <th *ngFor="let cabecera of cabeceras">{{cabecera.nombre}}  <i *ngIf="cabecera.ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabecera.ordenar==2" class="fas fa-angle-down"></i></th> -->
+                                    <th (click)="ordenar(cabeceras[0])" >{{cabeceras[0].nombre}}  <i *ngIf="cabeceras[0].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[0].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[1])" >{{cabeceras[1].nombre}}  <i *ngIf="cabeceras[1].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[1].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[2])"  *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' " >{{cabeceras[2].nombre}}  <i *ngIf="cabeceras[2].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[2].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[8])" >{{cabeceras[8].nombre}} <i *ngIf="cabeceras[8].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[8].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[3])" >{{cabeceras[3].nombre}} <i *ngIf="cabeceras[3].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[3].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[4])"  *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' ">{{cabeceras[4].nombre}}  <i *ngIf="cabeceras[4].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[4].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[5])"  *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' ">{{cabeceras[5].nombre}}  <i *ngIf="cabeceras[5].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[5].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[6])"  >{{cabeceras[6].nombre}} <i *ngIf="cabeceras[6].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[6].ordenar==2" class="fas fa-angle-down"></i></th>
+                                    <th (click)="ordenar(cabeceras[7])"  *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' ">{{cabeceras[7].nombre}}  <i *ngIf="cabeceras[7].ordenar==1" class="fas fa-angle-up"></i><i *ngIf="cabeceras[7].ordenar==2" class="fas fa-angle-down"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let id of inventarioDetalle">
-                                    <td>{{id.codigo}}</td>
-                                    <td>{{id.articulo}}</td>
-                                    <td class="text-right">{{id.stockTeorico}}</td>
-                                    <td class="text-right">{{id.cantidad}}</td>
-                                    <td class="text-right">{{id.faltante}}</td>
-                                    <td class="text-right">{{id.absValDif | currency:'S/. '}}</td>
-                                    <td>
-                                        <input [readonly]="esResumen" (change)="cambiaValorValidacion(id)" type="number"
-                                            [(ngModel)]="id.cantidadValidado" class="form-control">
+                                <tr *ngFor="let item of itemsPaginado[currentPage-1]">
+                                    <td>{{item.codigo}}</td>
+                                    <td>{{item.articulo}}</td>
+                                    <td *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' " class="text-right">{{item.stockTeorico}}</td>
+                                    <td >{{item.unidadMedida}}</td>
+                                    <td class="text-right">{{item.cantidad}}</td>
+                                    <td *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' " class="text-right">{{item.faltante}}</td>
+                                    <td *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' " class="text-right">{{item.absValDif | currency:'S/. '}}</td>
+                                    <td >
+                                        <input [readonly]="esResumen" (change)="cambiaValorValidacion(item)" type="number"
+                                            [(ngModel)]="item.cantidadValidado" class="form-control">
                                     </td>
-                                    <td>{{id.diferencia}}</td>
+                                    <td *ngIf="inventarioSeleccionado.archivoStock != null && inventarioSeleccionado.archivoStock != '-' ">{{item.diferencia}}</td>
                                 </tr>
                             </tbody>
                         </table>
+                        <div class="row justify-content-around p-4">
+                            <div class="col">
+                                <p><b>{{items.length}}</b> resultados</p>
+                                
+                            </div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination" >
+                                    <li class="page-item" [class.active]="currentPage==page" 
+                                    (click)="currentPage=page" *ngFor="let page of pages" selected><a class="page-link" >{{ page }}</a></li>
+                                </ul>
+                            </nav>
+                        </div>
 
                         <div class="modal-footer " *ngIf="!esResumen">
                             <button type="button" (click)="finalizar()" [disabled]="paso_1" class="btn btn-success">
@@ -273,9 +267,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body p-0 table-responsive">
-
-                    <table class="table">
+                <div class="modal-body table-responsive">
+                    <app-custom-table [items]="tomaInventarioDetalle" [cabeceras]="[{id:'codigo',nombre:'Codigo',ordenar:0},{id:'articulo',nombre:'Articulo',ordenar:0},{id:'blanco',nombre:'En blanco',ordenar:0,tipo:'booleano'},{id:'unidadMedida',nombre:'Unidad Medida',ordenar:0},{id:'cantidad',nombre:'Cantidad',ordenar:0}]"></app-custom-table>
+                    <!-- <table class="table">
                         <thead class="thead-light">
                             <tr>
                                 <th>Codigo</th>
@@ -294,7 +288,7 @@
                                 <td>{{det.cantidad}}</td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table> -->
                     <div class="text-center">
                         <button class="btn btn-sm btn-success" (click)="exportar(tomaInventarioDetalle)">Exportar excel</button>
                     </div>

@@ -5,13 +5,17 @@ import { MantenimientoComponent } from './mantenimiento/mantenimiento.component'
 import { ModulesModule } from '../modules/modules.module';
 import { AppRoutingModule } from '../app-routing.module';
 import { ReadexcelDirective } from '../directives/readexcel.directive';
+import { ReportesComponent } from './reportes/reportes.component';
+import { IngresosSalidasComponent } from './ingresos-salidas/ingresos-salidas.component';
 
 
 
 @NgModule({
   declarations: [
     InventarioComponent,
-    MantenimientoComponent
+    MantenimientoComponent,
+    ReportesComponent,
+    IngresosSalidasComponent
   ],
   imports: [
     CommonModule,
@@ -20,7 +24,9 @@ import { ReadexcelDirective } from '../directives/readexcel.directive';
   ],
   exports:[
     InventarioComponent,
-    MantenimientoComponent
+    MantenimientoComponent,
+    ReportesComponent,
+    IngresosSalidasComponent
   ]
 })
 export class SectionsModule { }

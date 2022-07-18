@@ -18,6 +18,9 @@ import { Familia } from '../models/familia.model';
 import { UnidadMedida } from '../models/unidad-medida.model';
 import { UsuarioArea } from '../models/usuario-area.model';
 import { ArticuloTipoInventario } from '../models/articulo-tipo-inventario.model';
+import { TomaConsolidadaCabecera, TomaConsolidadaDetalle } from '../models/toma-consolidada';
+import { MovimientoCabecera, MovimientoDetalle } from '../models/movimiento.model';
+import { IngresoSalidaConsolidada } from '../models/ingreso-salida-consolidada';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +32,7 @@ export class ApiService {
     this.leerToken();
   }
 
-    //Metodos auxiliares
+  //Metodos auxiliares
   leerToken() {
     if(localStorage.getItem('token-inventario-application')){
       this.token = localStorage.getItem('token-inventario-application');
@@ -63,6 +66,15 @@ export class ApiService {
   guardarUsuario(r:Result<UsuarioModel>){
     localStorage.setItem('token-inventario-application',"true");
     localStorage.setItem('user-inventario-application',JSON.stringify(r.response));
+  }
+
+  obtenerUsuarioLogeado():UsuarioModel{
+    var user:UsuarioModel= new UsuarioModel();
+    var objectUser = localStorage.getItem('user-inventario-application');
+    if(objectUser!=null){
+      user = JSON.parse(objectUser);
+    }
+    return user;
   }
 
   //METODOS PRINCIPALES
@@ -303,5 +315,31 @@ export class ApiService {
   }
   eliminarArticuloTipoInventario(articuloId:number,tipoInventarioId:number,areaId:number ){
     return this.http.delete<Result<number>>(`${this.BASE_URL}articulostipoinventario?articuloId=${articuloId}&tipoInventarioId=${tipoInventarioId}&areaId=${areaId}`);
+  }
+
+
+  // Toma Inventario Consolidada
+  obtenerTomaInventarioConsolidadaCabecera(fecha:string,tipo:string){
+    return this.http.get<Result<TomaConsolidadaCabecera[]>>(`${this.BASE_URL}tomasinventario/tomaconsolidadacabecera?fecha=${fecha}&tipo=${tipo}`);
+  }
+  obtenerTomaInventarioConsolidadaDetalle(fecha:string,tipo:string,tipoInventarioId:number,id:number){
+    return this.http.get<Result<TomaConsolidadaDetalle[]>>(`${this.BASE_URL}tomasinventario/tomaconsolidadadetalle?fecha=${fecha}&tipo=${tipo}&tipoInventarioId=${tipoInventarioId}&id=${id}`);
+  }
+
+  // Ingresos / Salidas
+  verificarRegistroMovimiento(tipoMovimiento:string,fecha:string,areaId:number){
+    return this.http.get<Result<MovimientoCabecera>>(`${this.BASE_URL}movimientos/verificar-registro-movimiento?tipoMovimiento=${tipoMovimiento}&fecha=${fecha}&areaId=${areaId}`);
+  }
+  iniciarRegistroMovimiento(tipoMovimiento:string,fecha:string,areaId:number){
+    return this.http.get<Result<MovimientoDetalle[]>>(`${this.BASE_URL}movimientos/iniciar-registro-movimiento?tipoMovimiento=${tipoMovimiento}&fecha=${fecha}&areaId=${areaId}`);
+  }
+  traerMovimientoDetalle(movimientoId:number){
+    return this.http.get<Result<MovimientoDetalle[]>>(`${this.BASE_URL}movimientos/traer-movimiento-detalle?movimientoId=${movimientoId}`);
+  }
+  guardarMovimientoDetalle(md:MovimientoDetalle[]){
+    return this.http.post<Result<number>>(`${this.BASE_URL}movimientos/movimiento-detalle`,md);
+  }
+  traerIngresoSalidaConsolidada(fechaAnterior:string,fechaActual:string,areaId:number){
+    return this.http.get<Result<IngresoSalidaConsolidada[]>>(`${this.BASE_URL}movimientos/ingreso-salida-consolidada?fechaAnterior=${fechaAnterior}&fechaActual=${fechaActual}&areaId=${areaId}`);
   }
 }
